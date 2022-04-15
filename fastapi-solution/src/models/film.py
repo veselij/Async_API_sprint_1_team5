@@ -16,3 +16,6 @@ class Film(BaseModel):
         # Заменяем стандартную работу с json на более быструю
         json_loads = orjson.loads
         json_dumps = orjson_dumps
+
+class Genre(BaseModel):
+    pass

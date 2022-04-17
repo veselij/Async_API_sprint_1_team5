@@ -1,8 +1,7 @@
-from functools import lru_cache
-
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch, NotFoundError
 from fastapi.param_functions import Depends
+from functools import lru_cache
 
 from common import RetrivalService
 from db.elastic import get_elastic

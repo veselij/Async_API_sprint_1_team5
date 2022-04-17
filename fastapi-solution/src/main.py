@@ -3,7 +3,6 @@ import uvicorn
 from elasticsearch import AsyncElasticsearch
 from fastapi.applications import FastAPI
 from fastapi.responses import ORJSONResponse
-
 from api.v1 import films, genres
 from core import config
 from db import elastic, redis

@@ -1,9 +1,9 @@
 import orjson
-from abc import abstractmethod
-from uuid import UUID
-from typing import List, Dict
 
+from abc import abstractmethod
 from pydantic import BaseModel as PydanticBaseModel
+from typing import Dict, List
+from uuid import UUID
 
 
 def orjson_dumps(v, *, default):

@@ -1,10 +1,10 @@
-from uuid import UUID
 from http import HTTPStatus
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from services.common import RetrivalService, get_genre_service
+from services.common import get_genre_service, RetrivalService
 
 router = APIRouter()
 

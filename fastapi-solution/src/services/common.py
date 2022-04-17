@@ -1,8 +1,11 @@
 from typing import Optional, Type
+
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
 from elasticsearch.exceptions import NotFoundError
+
 from models.common import BaseModel
+
 CACHE_EXPIRE_IN_SECONDS = 60 * 5
 
 

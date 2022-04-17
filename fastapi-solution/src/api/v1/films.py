@@ -1,14 +1,15 @@
 from http import HTTPStatus
-from typing import List, Dict
 from uuid import UUID
+from typing import Dict, List
 
-from fastapi.routing import APIRouter
 from fastapi.exceptions import HTTPException
 from fastapi.param_functions import Depends
+from fastapi.routing import APIRouter
 from pydantic import BaseModel
 
-from services.films import FilmService
 from services.films import get_film_service
+from services.films import FilmService
+
 router = APIRouter()
 
 

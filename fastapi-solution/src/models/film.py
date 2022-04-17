@@ -1,16 +1,18 @@
+from typing import Optional
 import orjson
 from typing import List, Dict
 from uuid import UUID
 
-# Используем pydantic для упрощения работы при перегонке данных из json в объекты
 from pydantic import BaseModel
 
+
+
 def orjson_dumps(v, *, default):
-    # orjson.dumps возвращает bytes, а pydantic требует unicode, поэтому декодируем
     return orjson.dumps(v, default=default).decode()
 
 
 
+<<<<<<< HEAD
 class Film(BaseModel):
     id: str
     title: str
@@ -20,10 +22,34 @@ class Film(BaseModel):
     # directors: List[Dict[UUID, str]]
     # actors: List[Dict[UUID, str]]
     # writers: List[Dict[UUID, str]]    
+=======
+class BaseObject(BaseModel):
+    id: str
+
+    def get_api_fileds(self) -> dict:
+        """Get api fields"""
+>>>>>>> origin/07_genre_person_logic
 
     class Config:
-        # Заменяем стандартную работу с json на более быструю
         json_loads = orjson.loads
         json_dumps = orjson_dumps
 
 
+<<<<<<< HEAD
+=======
+class Film(BaseObject):
+    title: str
+    description: str
+
+    def get_api_fileds(self) -> dict:
+        return {'uuid': self.id, 'title': self.title}
+
+
+class Genre(BaseObject):
+    name: str
+    description: Optional[str]
+
+    def get_api_fileds(self) -> dict:
+        return {'uuid': self.id, 'name': self.name}
+    
+>>>>>>> origin/07_genre_person_logic

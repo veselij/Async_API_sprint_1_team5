@@ -21,4 +21,4 @@ async def genre_details(genre_id: str, genre_services: RetrivalService = Depends
     if not genre:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
 
-    return Genre(**genre.get_api_fileds()) 
+    return Genre(**genre.get_api_fileds())

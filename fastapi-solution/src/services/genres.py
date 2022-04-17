@@ -10,6 +10,7 @@ from models.common import Genre
 
 from common import RetrivalService
 
+
 @lru_cache()
 def get_genre_service(
         redis: Redis = Depends(get_redis),

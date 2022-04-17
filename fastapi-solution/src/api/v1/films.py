@@ -19,7 +19,7 @@ class Film(BaseModel):
     genre: List[Dict[UUID, str]]
     directors: List[Dict[UUID, str]]
     actors: List[Dict[UUID, str]]
-    writers: List[Dict[UUID, str]]  
+    writers: List[Dict[UUID, str]]
 
 
 @router.get('/{film_id}', response_model=Film)
@@ -27,8 +27,7 @@ async def film_details(
     film_id: str,
     similar: bool = False,
     film_service: FilmService = Depends(get_film_service),
-    
-    ) -> Film:
+) -> Film:
     film = await film_service.get_by_id(film_id)
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
@@ -37,4 +36,4 @@ async def film_details(
         if not films:
             raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='similar films not found')
         return [Film(**film.get_api_fields()) for film in films]
-    return Film(**film.get_api_fileds()) 
+    return Film(**film.get_api_fileds())

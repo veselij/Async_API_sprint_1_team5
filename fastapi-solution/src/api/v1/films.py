@@ -34,6 +34,7 @@ async def film_details(
     similar: bool = False,
     film_service: FilmService = Depends(get_film_service),
 ) -> Film:
+    similars = []
     film = await film_service.get_by_id(film_id)
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
@@ -41,5 +42,5 @@ async def film_details(
         films = await film_service.get_by_genre(film.genre)
         if not films:
             raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='similar films not found')
-        return [SimilarFilm(**film.get_api_fields_for_similar()) for film in films]
-    return Film(**film.get_api_fields())
+        similars = [SimilarFilm(**film.get_api_fields_for_similar()) for film in films]
+    return [Film(**film.get_api_fields()), *similars]

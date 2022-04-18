@@ -64,7 +64,7 @@ class Genre(BaseModel):
 
 class Person(BaseModel):
     full_name: str
-    role: List[str]
+    role: str
     film_ds: List[UUID]
 
     def get_api_fields(self):

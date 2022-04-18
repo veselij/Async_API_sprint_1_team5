@@ -22,6 +22,11 @@ class Film(BaseModel):
     actors: List[Dict[UUID, str]]
     writers: List[Dict[UUID, str]]
 
+class SimilarFilm(BaseModel):
+    title: str
+    imdb_rating: str
+    description: str
+
 
 @router.get('/{film_id}', response_model=Film)
 async def film_details(
@@ -36,5 +41,5 @@ async def film_details(
         films = await film_service.get_by_genre(film.genre)
         if not films:
             raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='similar films not found')
-        return [Film(**film.get_api_fields()) for film in films]
-    return Film(**film.get_api_fileds())
+        return [SimilarFilm(**film.get_api_fields_for_similar()) for film in films]
+    return Film(**film.get_api_fields())

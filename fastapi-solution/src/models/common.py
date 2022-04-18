@@ -41,6 +41,13 @@ class Film(BaseModel):
             'actors': self.actors,
             'writers': self.writers,
         }
+    
+    def get_api_fields_for_similar(self):
+        return {
+            'uuid': self.uuid,
+            'title': self.title,
+            'imdb_rating': self.imdb_rating,
+        }
 
 
 class Genre(BaseModel):

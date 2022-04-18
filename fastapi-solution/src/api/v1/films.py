@@ -43,4 +43,5 @@ async def film_details(
         if not films:
             raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='similar films not found')
         similars = [SimilarFilm(**film.get_api_fields_for_similar()) for film in films]
-    return [Film(**film.get_api_fields()), *similars]
+        return [Film(**film.get_api_fields()), *similars]
+    return Film(**film.get_api_fields())

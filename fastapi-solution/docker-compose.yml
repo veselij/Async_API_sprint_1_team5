@@ -1,71 +1,99 @@
 version: '3.0'
 
-admin-environment: &admin-environment
-  - ...
-
-backend-environment: &backend-environment
-  - ...
-
 services:
-  backend:
-    container_name: backend
-    build:
-      context: . 
-      dockerfile: ./backend.Dockerfile
-    environment: *backend-environment
-
-  elastic:
-    container_name: elastic
-    build:
-      context: 'git repository address'
-    ports:
-      -$ELASTIC_PORT:$ELASTIC_PORT
-    environment:
-      - TZ=Moscow/Europe
-    volumes:
-      -elastic:/usr/share/elasticsearch/data
-
-  postgres:
-    container_name: postgres
-    image: postgres:13
-    expose:
-      - $POSTGRES_PORT
-    environment:
-      - POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-      - POSTGRES_USER: $POSTGRES_USER
-      - POSTGRES_DB: $POSTGRES_DB
-      - TZ=Moscow/Europe
-    volumes:
-      -postgres:/var/lib/postgresql/data
-
-  redis:
-    image: redis
-    container_name: redis
-    expose:
-      - $REDIS_PORT
-    environment:
-      - TZ=Moscow/Europe
-    volumes:
-      -redis:/data
-
   admin_panel:
     container_name: admin_panel
-    build:
-      context: 'git repository address'
-    environment: *admin-environment
-  
+    build: https://github.com/veselij/ya_admin_panel.git#main
+    networks:
+      - backend_nw
+    volumes:
+      - code:/code
+    env_file:
+      - .admin_panel.env
+    expose:
+      - 8000
+    depends_on:
+      - db
+  db:
+    image: postgres:13
+    container_name: pg_server
+    networks:
+      - backend_nw
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    env_file:
+      - ./.postgres.env
   nginx:
-    container_name: nginx
-    build: 
-      context: nginx
+    image: nginx:1.21.6
+    depends_on:
+      - admin_panel
     ports:
       - 80:80
+    networks:
+      - backend_nw
     volumes:
+      - code:/data:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/site.conf:/etc/nginx/conf.d/site.conf:ro
-      - static_volumes:/code/staticfiles    
+      - ./nginx/configs:/etc/nginx/conf.d/:ro
+  es:
+    image: elasticsearch:7.17.1
+    container_name: es_server
+    networks:
+      - backend_nw
+    environment:
+      - discovery.type=single-node
+    ports:
+      - 9200:9200
+    volumes:
+      - esdata:/usr/share/elasticsearch/data:rw
+  etl_service:
+    build: https://github.com/veselij/ya_etl.git#main
+    container_name: etl_service
+    networks:
+      - backend_nw
+    volumes:
+      - code_elt:/code
+    env_file:
+      - ./.etl.env
+    depends_on:
+      - admin_panel
+      - es
+  redis:
+    image: redis:6.2.6
+    container_name: redis
+    networks:
+      - backend_nw
+    volumes:
+      - redis_data:/data
+    ports:
+      - 6379:6379
+
+  fastapi:
+    container_name: fastapi
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    networks:
+      - backend_nw
+    volumes:
+      - code_api:/code
+    env_file:
+      - .fastapi.env
+    expose:
+      - 8000
+    depends_on:
+      - etl_service
+      - redis
+
 
 volumes:
-  -redis
-  -elastic
-  -static_volumes
+  code:
+  code_elt:
+  code_api:
+  pg_data:
+  esdata:
+  redis_data:
+
+networks:
+  backend_nw:
+    driver: bridge

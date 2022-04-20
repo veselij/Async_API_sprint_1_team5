@@ -58,7 +58,7 @@ class ShortFilm(Film):
 class Genre(BaseModel):
 
     name: str
-    description: str
+    description: Optional[str]
 
     def get_api_fields(self) -> dict:
         return {
@@ -72,12 +72,12 @@ class Person(BaseModel):
 
     full_name: str
     role: str
-    film_ds: list[str]
+    film_ids: Optional[list[str]]
 
     def get_api_fields(self) -> dict:
         return {
             'uuid': self.uuid,
             'full_name': self.full_name,
             'role': self.role,
-            'film_ids': self.film_ds,
+            'film_ids': self.film_ids,
         }

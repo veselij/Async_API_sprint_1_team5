@@ -42,7 +42,7 @@ class Film(BaseModel):
             'writers': self.writers,
         }
     
-    def get_api_fields_for_similar(self):
+    def get_api_fields_for_popular(self):
         return {
             'uuid': self.uuid,
             'title': self.title,

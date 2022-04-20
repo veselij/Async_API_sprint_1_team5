@@ -26,6 +26,13 @@ class RetrivalService:
 
         return obj
 
+    async def get_by_query(self, query):
+        try:
+            docs = await self.elastic.search(body=query, index=self.index_name)
+        except NotFoundError:
+            return None
+        return docs
+
     async def _get_obj_from_elastic(self, obj_id: str) -> Optional[BaseModel]:
         try:
             doc = await self.elastic.get(self.index_name, obj_id)

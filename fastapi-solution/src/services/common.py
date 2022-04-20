@@ -1,3 +1,4 @@
+from lib2to3.pgen2.token import OP
 from typing import Optional, Type
 
 from aioredis import Redis
@@ -26,7 +27,7 @@ class RetrivalService:
 
         return obj
 
-    async def get_by_query(self, query):
+    async def get_by_query(self, query) -> Optional[BaseModel]:
         try:
             docs = await self.elastic.search(body=query, index=self.index_name)
         except NotFoundError:

@@ -1,6 +1,6 @@
 from http import HTTPStatus
 from uuid import UUID
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional 
 
 from fastapi.exceptions import HTTPException
 from fastapi.param_functions import Depends
@@ -29,61 +29,34 @@ class PopularFilm(BaseModel):
 
 
 @router('/', response_model=PopularFilm)
-async def popular_films(
-    sort: str = '-imdb_rating',
-    page_size: int = 50,
-    page_num: int = 1,
-    film_service: FilmService = Depends(get_film_service),
-) -> List[PopularFilm]: 
-    data = []
-    for num in range(page_num):
-        query = {
-            'from': num*page_size,
-            'size': page_size,
-            'sort': [{
-                'imdb_rating': {
-                    'order': 'desc',
-                }
-            }]
-        }
-        films = await film_service._get_by_query(query)
-        if not films:
-            raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
-        data.extend(films)
-    return [Film(**film.get_api_fields_for_popular()) for film in data]
-
-
-@router('/', response_model=PopularFilm)
 async def popular_films_by_genre(
-    filter_genre_uuid: UUID,
+    filter_genre_uuid: Optional[UUID],
     sort: str = '-imdb_rating',
     page_size: int = 50,
     page_num: int = 1,
     film_service: FilmService = Depends(get_film_service),
 ) -> List[PopularFilm]:
-    data = []
-    for num in range(page_num):
-        query = {
-            'from': num*page_size,
-            'size': page_size,
-            'query': {
-                'bool': {
-                    'filter': {
-                        'term': {'uuid': filter_genre_uuid},
-                    }
-                },
-            },
-            'sort': [{
-                'imdb_rating': {
-                    'order': 'desc',
+    query = {
+        'from': (page_num-1)*page_size,
+        'size': page_size,
+        'sort': [{
+            'imdb_rating': {
+                'order': 'desc',
+            }
+        }]
+    }
+    if filter_genre_uuid is not None:
+        query['query'] = {
+            'bool': {
+                'filter': {
+                    'term': {'uuid': filter_genre_uuid},
                 }
-            }]
-        }
-        films = await film_service._get_by_query(query)
-        if not films:
-            raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
-        data.extend(films)
-    return [Film(**film.get_api_fields_for_popular()) for film in data]
+            },
+        },
+    films = await film_service._get_by_query(query)
+    if not films:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
+    return [PopularFilm(**film.get_api_fields_for_popular()) for film in films]
 
 
 @router.get('/{film_id}', response_model=Film)
@@ -104,20 +77,17 @@ async def films_search(
     page_num: int = 1,
     film_service: FilmService = Depends(get_film_service),
 ) -> List[PopularFilm]:
-    data = []
-    for num in range(page_num):
-        query = {
-            'from': num*page_size,
-            'size': page_size,
-            'query': {
-                'multi_match': {
-                    'query': query,
-                    'fields': ['description', 'title'],
-                }
+    query = {
+        'from': (page_num-1)*page_size,
+        'size': page_size,
+        'query': {
+            'multi_match': {
+                'query': query,
+                'fields': ['description', 'title'],
             }
         }
-        films = await film_service.get_by_query(query)
-        if not films:
-            raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
-        data.extend(films)
-    return [Film(**film.get_api_fields_for_popular()) for film in data]
+    }
+    films = await film_service.get_by_query(query)
+    if not films:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
+    return [PopularFilm(**film.get_api_fields_for_popular()) for film in films]

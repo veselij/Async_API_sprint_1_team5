@@ -8,7 +8,7 @@ from fastapi.routing import APIRouter
 from pydantic import BaseModel
 
 from services.films import get_film_service
-from services.films import FilmService
+from services.common import RetrivalService
 
 router = APIRouter()
 
@@ -28,13 +28,13 @@ class PopularFilm(BaseModel):
     description: str
 
 
-@router('/', response_model=PopularFilm)
+@router.get('/', response_model=PopularFilm)
 async def popular_films_by_genre(
     filter_genre_uuid: Optional[UUID],
     sort: str = '-imdb_rating',
     page_size: int = 50,
     page_num: int = 1,
-    film_service: FilmService = Depends(get_film_service),
+    film_service: RetrivalService = Depends(get_film_service),
 ) -> List[PopularFilm]:
     query = {
         'from': (page_num-1)*page_size,
@@ -62,7 +62,7 @@ async def popular_films_by_genre(
 @router.get('/{film_id}', response_model=Film)
 async def film_details(
     film_id: str,
-    film_service: FilmService = Depends(get_film_service),
+    film_service: RetrivalService = Depends(get_film_service),
 ) -> Film:
     film = await film_service.get_by_id(film_id)
     if not film:
@@ -75,7 +75,7 @@ async def films_search(
     query: str,
     page_size: int = 50,
     page_num: int = 1,
-    film_service: FilmService = Depends(get_film_service),
+    film_service: RetrivalService = Depends(get_film_service),
 ) -> List[PopularFilm]:
     query = {
         'from': (page_num-1)*page_size,

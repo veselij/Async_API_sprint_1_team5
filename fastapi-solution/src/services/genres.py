@@ -8,7 +8,7 @@ from db.elastic import get_elastic
 from db.redis import get_redis
 from models.common import Genre
 
-from common import RetrivalService
+from .common import RetrivalService
 
 
 @lru_cache()

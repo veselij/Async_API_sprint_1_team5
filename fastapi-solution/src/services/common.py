@@ -10,6 +10,7 @@ CACHE_EXPIRE_IN_SECONDS = 60 * 5
 
 
 class RetrivalService:
+
     def __init__(self, redis: Redis, elastic: AsyncElasticsearch, base_obj: Type[BaseModel], index_name: str):
         self.redis = redis
         self.elastic = elastic
@@ -26,16 +27,18 @@ class RetrivalService:
 
         return obj
 
-    async def get_by_query(self, query):
+    async def get_by_query(self, **kwargs) -> Optional[list[BaseModel]]:
+        if kwargs.get('sort', None) is not None and kwargs['sort'].startswith('-'):
+            kwargs['sort'] = "{0}:desc".format(kwargs['sort'][1:])
         try:
-            docs = await self.elastic.search(body=query, index=self.index_name)
+            docs = await self.elastic.search(index=self.index_name, **kwargs)
         except NotFoundError:
             return None
-        return docs
+        return [self.base_obj(**fields['_source']) for fields in docs['hits']['hits']]
 
     async def _get_obj_from_elastic(self, obj_id: str) -> Optional[BaseModel]:
         try:
-            doc = await self.elastic.get(self.index_name, obj_id)
+            doc = await self.elastic.get(index=self.index_name, id=obj_id)
         except NotFoundError:
             return None
         return self.base_obj(**doc['_source'])
@@ -49,4 +52,4 @@ class RetrivalService:
         return obj
 
     async def _put_obj_to_cache(self, obj: BaseModel):
-        await self.redis.set(obj.id, obj.json(), expire=CACHE_EXPIRE_IN_SECONDS)
+        await self.redis.set(obj.uuid, obj.json(), expire=CACHE_EXPIRE_IN_SECONDS)

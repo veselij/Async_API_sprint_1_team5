@@ -1,16 +1,18 @@
 from http import HTTPStatus
-from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi.exceptions import HTTPException
+from fastapi.param_functions import Depends
+from fastapi.routing import APIRouter
 from pydantic import BaseModel
 
-from services.common import get_genre_service, RetrivalService
+from services.common import RetrivalService
+from services.genres import get_genre_service
 
 router = APIRouter()
 
 
 class Genre(BaseModel):
-    id: UUID
+    id: str
     name: str
     description: str
 
@@ -20,5 +22,4 @@ async def genre_details(genre_id: str, genre_services: RetrivalService = Depends
     genre = await genre_services.get_by_id(genre_id)
     if not genre:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
-
-    return Genre(**genre.get_api_fileds())
+    return Genre(**genre.get_api_fields())

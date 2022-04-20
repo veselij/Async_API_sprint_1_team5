@@ -1,9 +1,8 @@
 import orjson
+from typing import Optional
 
 from abc import abstractmethod
 from pydantic import BaseModel as PydanticBaseModel
-from typing import Dict, List
-from uuid import UUID
 
 
 def orjson_dumps(v, *, default):
@@ -11,38 +10,44 @@ def orjson_dumps(v, *, default):
 
 
 class BaseModel(PydanticBaseModel):
-    uuid: UUID
+
+    uuid: str
 
     class Config:
         json_loads = orjson.loads
         json_dumps = orjson_dumps
 
     @abstractmethod
-    def get_api_fields(self):
+    def get_api_fields(self) -> dict:
         pass
 
 
 class Film(BaseModel):
-    title: str
-    description: str
-    imdb_rating: float
-    genre: List[Dict[UUID, str]]
-    directors: List[Dict[UUID, str]]
-    actors: List[Dict[UUID, str]]
-    writers: List[Dict[UUID, str]]
 
-    def get_api_fields(self):
+    title: str
+    imdb_rating: float
+    description: Optional[str]
+    genre: Optional[list[dict[str, str]]]
+    actors: Optional[list[dict[str, str]]]
+    writers: Optional[list[dict[str, str]]]
+    directors: Optional[list[dict[str, str]]]
+
+    def get_api_fields(self) -> dict:
         return {
             'uuid': self.uuid,
             'title': self.title,
+            'description': self.description,
             'imdb_rating': self.imdb_rating,
             'genre': self.genre,
-            'directors': self.directors,
             'actors': self.actors,
             'writers': self.writers,
+            'directors': self.directors,
         }
-    
-    def get_api_fields_for_popular(self):
+
+
+class ShortFilm(Film): 
+
+    def get_api_fields(self) -> dict:
         return {
             'uuid': self.uuid,
             'title': self.title,
@@ -51,10 +56,11 @@ class Film(BaseModel):
 
 
 class Genre(BaseModel):
+
     name: str
     description: str
 
-    def get_api_fields(self):
+    def get_api_fields(self) -> dict:
         return {
             'uuid': self.uuid,
             'name': self.name,
@@ -63,13 +69,15 @@ class Genre(BaseModel):
 
 
 class Person(BaseModel):
+
     full_name: str
     role: str
-    film_ds: List[UUID]
+    film_ds: list[str]
 
-    def get_api_fields(self):
+    def get_api_fields(self) -> dict:
         return {
             'uuid': self.uuid,
+            'full_name': self.full_name,
             'role': self.role,
             'film_ids': self.film_ds,
         }

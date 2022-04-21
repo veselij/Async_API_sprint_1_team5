@@ -3,38 +3,40 @@ import uvicorn
 from elasticsearch import AsyncElasticsearch
 from fastapi.applications import FastAPI
 from fastapi.responses import ORJSONResponse
+
 from api.v1 import films, genres, persons
 from core import config
 from db import elastic, redis
 
-
 app = FastAPI(
     title=config.PROJECT_NAME,
-    docs_url='/api/openapi',
-    openapi_url='/api/openapi.json',
+    docs_url="/api/openapi",
+    openapi_url="/api/openapi.json",
     default_response_class=ORJSONResponse,
 )
 
 
-@app.on_event('startup')
+@app.on_event("startup")
 async def startup():
-    redis.redis_client = await aioredis.create_redis_pool((config.REDIS_HOST, config.REDIS_PORT), minsize=10, maxsize=20)
-    elastic.es = AsyncElasticsearch(hosts=[f'http://{config.ELASTIC_HOST}:{config.ELASTIC_PORT}'])
+    redis.redis_client = await aioredis.create_redis_pool(
+        (config.REDIS_HOST, config.REDIS_PORT), minsize=10, maxsize=20,
+    )
+    elastic.es = AsyncElasticsearch(hosts=[f"http://{config.ELASTIC_HOST}:{config.ELASTIC_PORT}"])
 
 
-@app.on_event('shutdown')
+@app.on_event("shutdown")
 async def shutdown():
     redis.redis_client.close()
     await elastic.es.close()
 
 
-app.include_router(films.router, prefix='/api/v1/films', tags=['film'])
-app.include_router(genres.router, prefix='/api/v1/genres', tags=['genre'])
-app.include_router(persons.router, prefix='/api/v1/persons', tags=['person'])
+app.include_router(films.router, prefix="/api/v1/films", tags=["film"])
+app.include_router(genres.router, prefix="/api/v1/genres", tags=["genre"])
+app.include_router(persons.router, prefix="/api/v1/persons", tags=["person"])
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     uvicorn.run(
-        'main:app',
-        host='0.0.0.0',
+        "main:app",
+        host="0.0.0.0",
         port=8000,
     )

@@ -6,4 +6,3 @@ orjson
 pydantic==1.9.0
 uvicorn==0.12.2
 uvloop==0.14.0
-

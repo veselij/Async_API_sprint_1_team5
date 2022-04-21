@@ -1,7 +1,7 @@
-import orjson
+from abc import abstractmethod
 from typing import Optional
 
-from abc import abstractmethod
+import orjson
 from pydantic import BaseModel as PydanticBaseModel
 
 
@@ -45,7 +45,7 @@ class Film(BaseModel):
         }
 
 
-class ShortFilm(Film): 
+class ShortFilm(Film):
 
     def get_api_fields(self) -> dict:
         return {

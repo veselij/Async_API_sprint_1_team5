@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Any, Optional
 
 
 def get_query_film_by_genre(genre: Optional[str]) -> dict[str, Any]:
@@ -9,7 +9,7 @@ def get_query_film_by_genre(genre: Optional[str]) -> dict[str, Any]:
                     "path": "genre",
                     "query": {
                         "term": {
-                                "genre.uuid": genre
+                            "genre.uuid": genre
                         }
                     }
                 }
@@ -67,7 +67,7 @@ def get_query_films_by_person(person: str) -> dict[str, Any]:
                             "path": "writers",
                             "query": {
                                 "term": {
-                                        "writers.uuid": person
+                                    "writers.uuid": person
                                 }
                             }
                         }
@@ -77,7 +77,7 @@ def get_query_films_by_person(person: str) -> dict[str, Any]:
                             "path": "directors",
                             "query": {
                                 "term": {
-                                        "directors.uuid": person
+                                    "directors.uuid": person
                                 }
                             }
                         }
@@ -86,4 +86,3 @@ def get_query_films_by_person(person: str) -> dict[str, Any]:
             }
         }
     }
-

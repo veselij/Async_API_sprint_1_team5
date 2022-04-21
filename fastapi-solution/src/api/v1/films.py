@@ -1,15 +1,14 @@
 from http import HTTPStatus
 from typing import Optional
 
+from api.v1.queries import get_query_film_by_genre, get_query_film_search
+from core.decorators import cache
 from fastapi.exceptions import HTTPException
 from fastapi.param_functions import Depends
 from fastapi.routing import APIRouter
 from pydantic import BaseModel
-
 from services.common import RetrivalService
 from services.films import get_film_service, get_short_film_service
-from api.v1.queries import get_query_film_by_genre, get_query_film_search
-from core.decorators import cache
 
 router = APIRouter()
 
@@ -41,9 +40,11 @@ async def popular_films(
     page_size: int = 50,
     genre: Optional[str] = None,
     film_service: RetrivalService = Depends(get_short_film_service),
-) -> list[ShortFilmAPI]: 
+) -> list[ShortFilmAPI]:
     starting_doc = (page_num - 1) * page_size
-    films = await film_service.get_by_query(sort=sort, size=page_size, from_=starting_doc, **get_query_film_by_genre(genre))
+    films = await film_service.get_by_query(
+        sort=sort, size=page_size, from_=starting_doc, **get_query_film_by_genre(genre),
+    )
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
     return [ShortFilmAPI(**film.get_api_fields()) for film in films]
@@ -70,7 +71,9 @@ async def films_search(
     film_service: RetrivalService = Depends(get_short_film_service),
 ) -> list[ShortFilmAPI]:
     starting_doc = (page_num - 1) * page_size
-    films = await film_service.get_by_query(size=page_size, from_=starting_doc, **get_query_film_search(query))
+    films = await film_service.get_by_query(
+        size=page_size, from_=starting_doc, **get_query_film_search(query),
+    )
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
     return [ShortFilmAPI(**film.get_api_fields()) for film in films]

@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from services.common import RetrivalService
 from services.genres import get_genre_service
+from core.decorators import cache
 
 router = APIRouter()
 
@@ -19,6 +20,7 @@ class GenreAPI(BaseModel):
 
 
 @router.get('/', response_model=list[GenreAPI])
+@cache()
 async def get_genres(
     page_num: int = 1,
     page_size: int = 50,
@@ -32,6 +34,7 @@ async def get_genres(
 
 
 @router.get('/{uuid}', response_model=GenreAPI)
+@cache()
 async def genre_details(uuid: str, genre_services: RetrivalService = Depends(get_genre_service)) -> GenreAPI:
     genre = await genre_services.get_by_id(uuid)
     if not genre:

@@ -11,6 +11,7 @@ from services.persons import get_person_service
 from services.films import get_short_film_service
 from api.v1.queries import get_query_person_search, get_query_films_by_person
 from api.v1.films import ShortFilmAPI
+from core.decorators import cache
 
 router = APIRouter()
 
@@ -23,6 +24,7 @@ class PersonAPI(BaseModel):
 
 
 @router.get('/{uuid}', response_model=PersonAPI)
+@cache()
 async def person_details(uuid: str, person_services: RetrivalService = Depends(get_person_service)) -> PersonAPI:
     person = await person_services.get_by_id(uuid)
     if not person:
@@ -31,6 +33,7 @@ async def person_details(uuid: str, person_services: RetrivalService = Depends(g
 
 
 @router.get('/{uuid}/films/', response_model=list[ShortFilmAPI])
+@cache()
 async def person_films(
     query: str,
     page_num: int = 1,
@@ -45,6 +48,7 @@ async def person_films(
 
 
 @router.get('/search/')
+@cache()
 async def person_search(
     query: str,
     page_num: int = 1,

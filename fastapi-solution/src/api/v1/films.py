@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from services.common import RetrivalService
 from services.films import get_film_service, get_short_film_service
 from api.v1.queries import get_query_film_by_genre, get_query_film_search
+from core.decorators import cache
 
 router = APIRouter()
 
@@ -33,6 +34,7 @@ class ShortFilmAPI(BaseModel):
 
 
 @router.get('/', response_model=list[ShortFilmAPI])
+@cache()
 async def popular_films(
     sort: str = '-imdb_rating',
     page_num: int = 1,
@@ -48,6 +50,7 @@ async def popular_films(
 
 
 @router.get('/{uuid}', response_model=FilmAPI)
+@cache()
 async def film_details(
     uuid: str,
     film_service: RetrivalService = Depends(get_film_service),
@@ -59,6 +62,7 @@ async def film_details(
 
 
 @router.get('/search/', response_model=list[ShortFilmAPI])
+@cache()
 async def films_search(
     query: str,
     page_num: int = 1,

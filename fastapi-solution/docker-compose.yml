@@ -30,6 +30,7 @@ services:
       - fastapi
     ports:
       - 80:80
+      - 81:81
     networks:
       - backend_nw
     volumes:

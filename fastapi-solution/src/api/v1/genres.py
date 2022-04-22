@@ -1,21 +1,15 @@
 from http import HTTPStatus
-from typing import Optional
 
 from core.decorators import cache
 from fastapi.exceptions import HTTPException
 from fastapi.param_functions import Depends
 from fastapi.routing import APIRouter
-from pydantic import BaseModel
+from .exceptions import GenreExceptionMessages as GEM
+from models.response_models import GenreAPI
 from services.common import RetrivalService
 from services.genres import get_genre_service
 
 router = APIRouter()
-
-
-class GenreAPI(BaseModel):
-    uuid: str
-    name: str
-    description: Optional[str]
 
 
 @router.get('/', response_model=list[GenreAPI])
@@ -28,7 +22,7 @@ async def get_genres(
     starting_doc = (page_num - 1) * page_size
     genres = await genre_service.get_by_query(size=page_size, from_=starting_doc)
     if not genres:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='genres not found')
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=GEM.GENRES_NOT_FOUND)
     return [GenreAPI(**genre.get_api_fields()) for genre in genres]
 
 
@@ -39,5 +33,5 @@ async def genre_details(
 ) -> GenreAPI:
     genre = await genre_services.get_by_id(uuid)
     if not genre:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='genre not found')
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=GEM.GENRE_NOT_FOUND)
     return GenreAPI(**genre.get_api_fields())

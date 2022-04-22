@@ -9,13 +9,16 @@ def orjson_dumps(v, *, default):
     return orjson.dumps(v, default=default).decode()
 
 
-class BaseModel(PydanticBaseModel):
-
-    uuid: str
+class ConfigMixin():
 
     class Config:
         json_loads = orjson.loads
         json_dumps = orjson_dumps
+
+
+class BaseModel(PydanticBaseModel, ConfigMixin):
+
+    uuid: str
 
     @abstractmethod
     def get_api_fields(self) -> dict:

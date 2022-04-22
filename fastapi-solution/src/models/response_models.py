@@ -1,10 +1,9 @@
 from typing import Optional
-from .common import BaseModel
+from .common import ConfigMixin
+from pydantic import BaseModel
 
 
-class FilmAPI(BaseModel):
-
-    uuid: str
+class FilmAPI(BaseModel, ConfigMixin):
     title: str
     imdb_rating: float
     description: Optional[str]
@@ -14,20 +13,17 @@ class FilmAPI(BaseModel):
     directors: Optional[list[dict[str, str]]]
 
 
-class ShortFilmAPI(BaseModel):
-    uuid: str
+class ShortFilmAPI(BaseModel, ConfigMixin):
     title: str
     imdb_rating: str
 
 
-class GenreAPI(BaseModel):
-    uuid: str
+class GenreAPI(BaseModel, ConfigMixin):
     name: str
     description: Optional[str]
 
 
-class PersonAPI(BaseModel):
-    uuid: str
+class PersonAPI(BaseModel, ConfigMixin):
     full_name: str
     role: str
     film_ids: Optional[list[str]]

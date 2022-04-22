@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from api.v1.queries import get_query_films_by_person, get_query_person_search
 from core.decorators import cache
-from exceptions import PersonExceptionMessages as PEM
+from .exceptions import PersonExceptionMessages as PEM
 from fastapi.exceptions import HTTPException
 from fastapi.param_functions import Depends
 from fastapi.routing import APIRouter

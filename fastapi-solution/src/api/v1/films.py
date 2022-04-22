@@ -3,7 +3,7 @@ from typing import Optional
 
 from api.v1.queries import get_query_film_by_genre, get_query_film_search
 from core.decorators import cache
-from exceptions import FilmExceptionMessages as FEM
+from .exceptions import FilmExceptionMessages as FEM
 from fastapi.exceptions import HTTPException
 from fastapi.param_functions import Depends
 from fastapi.routing import APIRouter

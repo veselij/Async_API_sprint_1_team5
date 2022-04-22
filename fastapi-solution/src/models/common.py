@@ -10,7 +10,6 @@ def orjson_dumps(v, *, default):
 
 
 class ConfigMixin():
-    uuid: str
 
     class Config:
         json_loads = orjson.loads
@@ -18,6 +17,8 @@ class ConfigMixin():
 
 
 class BaseModel(PydanticBaseModel, ConfigMixin):
+
+    uuid: str
 
     @abstractmethod
     def get_api_fields(self) -> dict:

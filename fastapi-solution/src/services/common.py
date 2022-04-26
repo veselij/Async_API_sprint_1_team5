@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from typing import Optional, Type
 
 from aioredis import Redis
@@ -5,50 +6,90 @@ from elasticsearch import AsyncElasticsearch
 from elasticsearch.exceptions import NotFoundError
 from models.common import BaseModel
 
-CACHE_EXPIRE_IN_SECONDS = 60 * 5
+
+class DataBaseManager(ABC):
+
+    @abstractmethod
+    async def get_obj_from_db_by_id(self, obj_id: str, table_name: str) -> Optional[dict]:
+        pass
+
+    @abstractmethod
+    async def get_objs_by_query(self, table_name: str, **kwargs) -> Optional[list[dict]]:
+        pass
+
+
+class ElasticDataBaseManager(DataBaseManager):
+
+    def __init__(self, elastic: AsyncElasticsearch) -> None:
+        self.elastic = elastic
+
+    async def get_obj_from_db_by_id(self, obj_id: str, table_name: str) -> Optional[dict]:
+        try:
+            doc = await self.elastic.get(index=table_name, id=obj_id)
+        except NotFoundError:
+            return None
+        return doc['_source']
+
+    async def get_objs_by_query(self, table_name: str, **kwargs) -> Optional[list[dict]]:
+        if kwargs.get('sort', None) is not None and kwargs['sort'].startswith('-'):
+            kwargs['sort'] = "{0}:desc".format(kwargs['sort'][1:])
+        try:
+            docs = await self.elastic.search(index=table_name, **kwargs)
+        except NotFoundError:
+            return None
+        return [fields['_source'] for fields in docs['hits']['hits']]
+
+
+class BaseCache(ABC):
+
+    cache_timer = 60 * 5
+
+    @abstractmethod
+    async def get_obj_from_cache(self, obj_id: str) -> Optional[str]:
+        pass
+
+    @abstractmethod
+    async def put_obj_to_cache(self, key: str, obj: str) -> None:
+        pass
+
+
+class RedisCache(BaseCache):
+
+    def __init__(self, redis: Redis) -> None:
+        self.redis = redis
+
+    async def get_obj_from_cache(self, obj_id: str) -> Optional[str]:
+        data = await self.redis.get(obj_id)
+        if not data:
+            return None
+        return data
+
+    async def put_obj_to_cache(self, key: str, obj: str) -> None:
+        await self.redis.set(key, obj, expire=self.cache_timer)
 
 
 class RetrivalService:
 
-    def __init__(self, redis: Redis, elastic: AsyncElasticsearch, base_obj: Type[BaseModel], index_name: str):
-        self.redis = redis
-        self.elastic = elastic
+    def __init__(self, cache: BaseCache, db_manager: DataBaseManager, base_obj: Type[BaseModel], index_name: str):
+        self.cache = cache
+        self.db_manager = db_manager
         self.base_obj = base_obj
         self.index_name = index_name
 
     async def get_by_id(self, obj_id: str) -> Optional[BaseModel]:
-        obj = await self._obj_from_cache(obj_id)
+        obj = await self.cache.get_obj_from_cache(obj_id)
         if not obj:
-            obj = await self._get_obj_from_elastic(obj_id)
+            obj = await self.db_manager.get_obj_from_db_by_id(obj_id, self.index_name)
             if not obj:
                 return None
-            await self._put_obj_to_cache(obj)
-
-        return obj
+            obj_model = self.base_obj.parse_obj(obj)
+            await self.cache.put_obj_to_cache(obj_model.uuid, obj_model.json())
+        else:
+            obj_model = self.base_obj.parse_raw(obj)
+        return obj_model
 
     async def get_by_query(self, **kwargs) -> Optional[list[BaseModel]]:
-        if kwargs.get('sort', None) is not None and kwargs['sort'].startswith('-'):
-            kwargs['sort'] = "{0}:desc".format(kwargs['sort'][1:])
-        try:
-            docs = await self.elastic.search(index=self.index_name, **kwargs)
-        except NotFoundError:
+        docs = await self.db_manager.get_objs_by_query(self.index_name, **kwargs)
+        if not docs:
             return None
-        return [self.base_obj(**fields['_source']) for fields in docs['hits']['hits']]
-
-    async def _get_obj_from_elastic(self, obj_id: str) -> Optional[BaseModel]:
-        try:
-            doc = await self.elastic.get(index=self.index_name, id=obj_id)
-        except NotFoundError:
-            return None
-        return self.base_obj(**doc['_source'])
-
-    async def _obj_from_cache(self, obj_id: str) -> Optional[BaseModel]:
-        data = await self.redis.get(obj_id)
-        if not data:
-            return None
-
-        obj = self.base_obj.parse_raw(data)
-        return obj
-
-    async def _put_obj_to_cache(self, obj: BaseModel):
-        await self.redis.set(obj.uuid, obj.json(), expire=CACHE_EXPIRE_IN_SECONDS)
+        return [self.base_obj.parse_obj(fields) for fields in docs]

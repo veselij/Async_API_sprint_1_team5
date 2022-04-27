@@ -1,5 +1,4 @@
 import aioredis
-import uvicorn
 from elasticsearch import AsyncElasticsearch
 from fastapi.applications import FastAPI
 from fastapi.responses import ORJSONResponse

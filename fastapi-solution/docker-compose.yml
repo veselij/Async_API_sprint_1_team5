@@ -82,6 +82,7 @@ services:
       - code_api:/code
     env_file:
       - .fastapi.env
+    entrypoint: ["gunicorn", "main:app", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
     expose:
       - 8000
     depends_on:

@@ -1,0 +1,67 @@
+version: '3.0'
+
+services:
+  es:
+    image: elasticsearch:7.17.1
+    container_name: es_test_server
+    networks:
+      - backend_nw
+    environment:
+      - discovery.type=single-node
+    ports:
+      - 9200:9200
+    volumes:
+      - esdata_test:/usr/share/elasticsearch/data:rw
+    logging:
+        driver: none
+  redis:
+    image: redis:6.2.6
+    container_name: redis_test
+    networks:
+      - backend_nw
+    volumes:
+      - redis_data_test:/data
+    ports:
+      - 6379:6379
+    logging:
+        driver: none
+  fastapi:
+    container_name: fastapi
+    build:
+      context: ../../.
+    image: fastapi
+    networks:
+      - backend_nw
+    volumes:
+      - code_api:/code
+    env_file:
+      - .fastapi_test.env
+    entrypoint: ["uvicorn", "main:app","--host", "0.0.0.0", "--port", "8000"]
+    expose:
+      - 8000
+    depends_on:
+      - redis
+      - es
+    logging:
+        driver: none
+  tests:
+    container_name: fastapi_test
+    build:
+      context: .
+    volumes:
+      - code_test:/code_test
+    env_file:
+      - .fastapi_test.env
+    networks:
+      - backend_nw
+
+
+volumes:
+  code_api:
+  code_test:
+  esdata_test:
+  redis_data_test:
+
+networks:
+  backend_nw:
+    driver: bridge

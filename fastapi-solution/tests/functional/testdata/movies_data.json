@@ -1,0 +1,104 @@
+[
+    {
+  "uuid": "2a090dde-f688-46fe-a9f4-b781a985275e",
+  "title": "Star Wars: Knights of the Old Republic",
+  "imdb_rating": 9.6,
+  "description": "Four thousand years before the fall of the Republic, before the fall of the Jedi, a great war was fought, between the armies of the Sith and the forces of the Republic. A warrior is chosen to rescue a Jedi with a power important to the cause of the Republic, but in the end, will the warrior fight for the Light Side of the Force, or succumb to the Darkness?",
+  "genre": [
+    {
+      "uuid": "3d8d9bf5-0d90-4353-88ba-4ccc5d2c07ff",
+      "name": "Action"
+    },
+    {
+      "uuid": "120a21cf-9097-479e-904a-13dd7198c1dd",
+      "name": "Adventure"
+    },
+    {
+      "uuid": "b92ef010-5e4c-4fd0-99d6-41b6456272cd",
+      "name": "Fantasy"
+    }
+  ],
+  "actors": [
+    {
+      "uuid": "00395304-dd52-4c7b-be0d-c2cd7a495684",
+      "name": "Jennifer Hale"
+    },
+    {
+      "uuid": "2802ff93-f147-49cc-a38b-2f787bd2b875",
+      "name": "John Cygan"
+    },
+    {
+      "uuid": "578593ee-3268-4cd4-b910-8a44cfd05b73",
+      "name": "Rafael Ferrer"
+    },
+    {
+      "uuid": "bccbbbb6-be40-44f5-a025-204bcfcf2667",
+      "name": "Raphael Sbarge"
+    }
+  ],
+  "writers": [
+    {
+      "uuid": "1bc82e3e-d9ea-4da0-a5ea-69ba20b94373",
+      "name": "Lukas Kristjanson"
+    },
+    {
+      "uuid": "1e8d746d-72d2-4da2-ad20-651154cfb158",
+      "name": "Michael Gallo"
+    },
+    {
+      "uuid": "61bffbdc-910e-47b9-8b04-43b5f27807b4",
+      "name": "James Ohlen"
+    },
+    {
+      "uuid": "63a787ba-dd3f-4176-a894-9970b5c43a12",
+      "name": "Drew Karpyshyn"
+    },
+    {
+      "uuid": "8778550c-90c6-4180-a6ac-eba956f0ce59",
+      "name": "David Gaider"
+    },
+    {
+      "uuid": "91c4ca66-e3e1-4932-8447-aadd67fd67b1",
+      "name": "Peter Thomas"
+    },
+    {
+      "uuid": "b29e255d-644d-4e16-9018-c1bcb49934e5",
+      "name": "Lynn Taylor"
+    },
+    {
+      "uuid": "f7337af0-21aa-445f-aecf-4794c0faa811",
+      "name": "Brett Rector"
+    }
+  ],
+  "directors": [
+    {
+      "uuid": "1a9e7e1f-393b-455d-a76f-d3ad2b33673e",
+      "name": "Casey Hudson"
+    }
+  ]
+},
+{
+  "uuid": "05d7341e-e367-4e2e-acf5-4652a8435f93",
+  "title": "The Secret World of Jeffree Star",
+  "imdb_rating": 9.5,
+  "description": "Shane Dawson interviews and spends a day with one of the most interesting and controversial people on the internet, Jeffrey Star, in a five part series.",
+  "genre": [
+    {
+      "uuid": "6d141ad2-d407-4252-bda4-95590aaf062a",
+      "name": "Documentary"
+    }
+  ],
+  "actors": [
+    {
+      "uuid": "901595ba-4278-4224-b04c-974c28428a08",
+      "name": "Shane Dawson"
+    },
+    {
+      "uuid": "99a9ef8f-c45d-44b3-ab09-e39685e011f5",
+      "name": "Jeffree Star"
+    }
+  ],
+  "writers": [],
+  "directors": []
+}
+]

@@ -17,7 +17,7 @@ class FilmAPI(BaseModel, ConfigMixin):
 class ShortFilmAPI(BaseModel, ConfigMixin):
     uuid: str
     title: str
-    imdb_rating: str
+    imdb_rating: float
 
 
 class GenreAPI(BaseModel, ConfigMixin):

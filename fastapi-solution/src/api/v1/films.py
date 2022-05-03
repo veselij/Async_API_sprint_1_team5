@@ -5,7 +5,7 @@ from api.v1.queries import get_query_film_by_genre, get_query_film_search
 from core.decorators import cache
 from .exceptions import FilmExceptionMessages as FEM
 from fastapi.exceptions import HTTPException
-from fastapi.param_functions import Depends
+from fastapi.param_functions import Depends, Query
 from fastapi.routing import APIRouter
 from models.response_models import FilmAPI, ShortFilmAPI
 from services.common import RetrivalService
@@ -18,8 +18,8 @@ router = APIRouter()
 @cache()
 async def popular_films(
     sort: str = '-imdb_rating',
-    page_num: int = 1,
-    page_size: int = 50,
+    page_num: int = Query(1, ge=1),
+    page_size: int = Query(50, ge=1),
     genre: Optional[str] = None,
     film_service: RetrivalService = Depends(get_short_film_service),
 ) -> list[ShortFilmAPI]:
@@ -48,8 +48,8 @@ async def film_details(
 @cache()
 async def films_search(
     query: str,
-    page_num: int = 1,
-    page_size: int = 50,
+    page_num: int = Query(1, ge=1),
+    page_size: int = Query(50, ge=1),
     film_service: RetrivalService = Depends(get_short_film_service),
 ) -> list[ShortFilmAPI]:
     starting_doc = (page_num - 1) * page_size

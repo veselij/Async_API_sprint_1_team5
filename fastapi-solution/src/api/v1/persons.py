@@ -4,7 +4,7 @@ from api.v1.queries import get_query_films_by_person, get_query_person_search
 from core.decorators import cache
 from .exceptions import PersonExceptionMessages as PEM
 from fastapi.exceptions import HTTPException
-from fastapi.param_functions import Depends
+from fastapi.param_functions import Depends, Query
 from fastapi.routing import APIRouter
 from models.response_models import ShortFilmAPI, PersonAPI
 from services.common import RetrivalService
@@ -29,8 +29,8 @@ async def person_details(
 @cache()
 async def person_films(
     query: str,
-    page_num: int = 1,
-    page_size: int = 50,
+    page_num: int = Query(1, ge=1),
+    page_size: int = Query(50, ge=1),
     film_service: RetrivalService = Depends(get_short_film_service),
 ) -> list[ShortFilmAPI]:
     starting_doc = (page_num - 1) * page_size
@@ -49,8 +49,8 @@ async def person_films(
 @cache()
 async def person_search(
     query: str,
-    page_num: int = 1,
-    page_size: int = 50,
+    page_num: int = Query(1, ge=1),
+    page_size: int = Query(50, ge=1),
     person_service: RetrivalService = Depends(get_person_service),
 ) -> list[PersonAPI]:
     starting_doc = (page_num - 1) * page_size

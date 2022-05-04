@@ -1,7 +1,7 @@
 import pytest
 
 from settings import config
-from testdata.movies import testdata
+from testdata.movies import test_data_num_outputs, test_data_wrong_params
 
 
 
@@ -16,21 +16,23 @@ async def test_films_search_not_existing(query, make_get_request, clear_redis):
 
 
 @pytest.mark.asyncio
-async def test_films_search_missing_required_parameter(make_get_request, clear_redis):
+@pytest.mark.parametrize("params,results", test_data_wrong_params)
+async def test_films_search_missing_required_parameter(params, results, make_get_request, clear_redis):
 
-    response = await make_get_request("http://{0}:8000/api/v1/films/search/".format(config.api_ip))
+    response = await make_get_request("http://{0}:8000/api/v1/films/search/{1}".format(config.api_ip, params))
 
     assert response.status == 422
-    assert response.body == {"detail":[{"loc":["query","query"],"msg":"field required","type":"value_error.missing"}]}
+    assert response.body == results
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("page_num,page_size,query,number", testdata)
+@pytest.mark.parametrize("page_num,page_size,query,number,code", test_data_num_outputs)
 async def test_films_search(
     page_num,
     page_size,
     query,
     number,
+    code,
     make_get_request,
     prepare_es_index,
     populate_index,
@@ -46,7 +48,7 @@ async def test_films_search(
         )
     )
 
-    assert response.status == 200
+    assert response.status == code
     assert len(response.body) == number
 
 

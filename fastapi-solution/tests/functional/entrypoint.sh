@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "starting tests"
-python utils/wait_for_es.py && python utils/wait_for_redis.py && python -m pytest src/
+python -m utils.wait_for_es && python -m utils.wait_for_redis && python -m pytest src/
 echo "tests finished"
 
 

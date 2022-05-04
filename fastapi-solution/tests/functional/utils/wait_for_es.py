@@ -11,5 +11,5 @@ def check_es_ready():
         sleep(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     check_es_ready()

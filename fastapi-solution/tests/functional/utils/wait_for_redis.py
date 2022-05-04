@@ -1,18 +1,11 @@
 import asyncio
-import os
-import sys
 
 import aioredis
 
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-
-from settings import ConfigSettings
+from settings import config
 
 
 async def check_redis_ready():
-    config = ConfigSettings()
     redis = await aioredis.create_redis("redis://{0}:{1}".format(config.redis_host, config.redis_port))
     while not await redis.ping():
         asyncio.sleep(1)

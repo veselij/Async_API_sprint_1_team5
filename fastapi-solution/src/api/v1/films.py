@@ -14,7 +14,7 @@ from services.films import get_film_service, get_short_film_service
 router = APIRouter()
 
 
-@router.get('/', response_model=list[ShortFilmAPI])
+@router.get('/', response_model=list(ShortFilmAPI))
 @cache()
 async def popular_films(
     sort: str = '-imdb_rating',
@@ -22,7 +22,7 @@ async def popular_films(
     page_size: int = Query(50, ge=1),
     genre: Optional[str] = None,
     film_service: RetrivalService = Depends(get_short_film_service),
-) -> list[ShortFilmAPI]:
+) -> list(ShortFilmAPI):
     starting_doc = (page_num - 1) * page_size
     films = await film_service.get_by_query(
         sort=sort, size=page_size, from_=starting_doc, **get_query_film_by_genre(genre),
@@ -44,14 +44,14 @@ async def film_details(
     return FilmAPI(**film.get_api_fields())
 
 
-@router.get('/search/', response_model=list[ShortFilmAPI])
+@router.get('/search/', response_model=list(ShortFilmAPI))
 @cache()
 async def films_search(
     query: str,
     page_num: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1),
     film_service: RetrivalService = Depends(get_short_film_service),
-) -> list[ShortFilmAPI]:
+) -> list(ShortFilmAPI):
     starting_doc = (page_num - 1) * page_size
     films = await film_service.get_by_query(
         size=page_size, from_=starting_doc, **get_query_film_search(query),

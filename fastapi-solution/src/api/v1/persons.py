@@ -45,7 +45,7 @@ async def person_films(
     return [ShortFilmAPI(**film.get_api_fields()) for film in films]
 
 
-@router.get('/search/')
+@router.get('/search/', response_model=list[PersonAPI])
 @cache()
 async def person_search(
     query: str,

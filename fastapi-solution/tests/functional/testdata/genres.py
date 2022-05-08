@@ -1,9 +1,9 @@
 import json
 
-genre_pagination_wrong_params = {
+genre_pagination_wrong_params = [
     ("?page_num=-1&page_size=1", {"detail":[{"loc":["query","page_num"],"msg":"ensure this value is greater than or equal to 1","type":"value_error.number.not_ge","ctx":{"limit_value":1}}]}),
     ("?page_num=1&page_size=-1", {"detail":[{"loc":["query","page_size"],"msg":"ensure this value is greater than or equal to 1","type":"value_error.number.not_ge","ctx":{"limit_value":1}}]}),
-}
+]
 
 
 genre_test_data = [

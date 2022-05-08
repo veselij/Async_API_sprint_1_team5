@@ -77,7 +77,7 @@ async def test_genre_cashe(
     )
 
     assert response.status == 200
-    assert len(response.body) == [{
+    assert response.body == [{
         "uuid": "3d8d9bf5-0d90-4353-88ba-4ccc5d2c07ff",
         "name": "Action",
         "description": ""
@@ -92,7 +92,7 @@ async def test_genre_cashe(
     )
 
     assert response.status == 200
-    assert len(response.body) == [{
+    assert response.body == [{
         "uuid": "3d8d9bf5-0d90-4353-88ba-4ccc5d2c07ff",
         "name": "Action",
         "description": ""

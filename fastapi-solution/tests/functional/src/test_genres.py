@@ -8,7 +8,7 @@ from testdata.genres import genre_pagination_wrong_params, genre_pagination_test
 @pytest.mark.parametrize('params,results', genre_pagination_wrong_params)
 async def test_genre_pagination_wrong_params(params, results, make_get_request, clear_redis):
 
-    response = make_get_request(
+    response = await make_get_request(
         f'http://{config.api_ip}:8000/api/v1/genres/{params}'
     )
 
@@ -32,7 +32,7 @@ async def test_genres(
     await prepare_es_index("testdata/genres.json")
     await populate_index("testdata/genres_data.json")
 
-    response = make_get_request(
+    response = await  make_get_request(
         f'http://{config.api_ip}:8000/api/v1/genres/?page_num={page_num}&page_size={page_size}'
     )
 
@@ -53,12 +53,12 @@ async def test_genre_by_uuid(
     await prepare_es_index("testdata/genres.json")
     await populate_index("testdata/genres_data.json")
 
-    response = make_get_request(
+    response = await make_get_request(
         f'http://{config.api_ip}:8000/api/v1/genres/{uuid}'
     )
 
     assert response.status == 200
-    assert len(response.body) == result
+    assert response.body == result
 
 @pytest.mark.asyncio
 async def test_genre_cashe(
@@ -72,30 +72,30 @@ async def test_genre_cashe(
     await prepare_es_index("testdata/genres.json")
     await populate_index("testdata/genres_data.json")
 
-    response = make_get_request(
+    response = await make_get_request(
         f'http://{config.api_ip}:8000/api/v1/genres/3d8d9bf5-0d90-4353-88ba-4ccc5d2c07ff'
     )
 
     assert response.status == 200
-    assert len(response.body) == [{
+    assert response.body == {
         "uuid": "3d8d9bf5-0d90-4353-88ba-4ccc5d2c07ff",
         "name": "Action",
         "description": ""
-    }]
+    }
 
 
     await es_client.options(ignore_status=[404]).indices.delete(index="movies")
     assert not await es_client.indices.exists(index="movies")
 
-    response = make_get_request(
+    response = await make_get_request(
         f'http://{config.api_ip}:8000/api/v1/genres/3d8d9bf5-0d90-4353-88ba-4ccc5d2c07ff'
     )
 
     assert response.status == 200
-    assert len(response.body) == [{
+    assert response.body == {
         "uuid": "3d8d9bf5-0d90-4353-88ba-4ccc5d2c07ff",
         "name": "Action",
         "description": ""
-    }]
+    }
 
 

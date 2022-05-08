@@ -45,7 +45,6 @@ async def popular_films(
     description="Запрос фильма по его идентификатору",
     response_description="Полная информация о фильме",
 )
-@cache()
 async def film_details(
     uuid: str,
     film_service: RetrivalService = Depends(get_film_service),

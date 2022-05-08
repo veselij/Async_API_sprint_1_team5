@@ -15,7 +15,6 @@ router = APIRouter()
 
 
 @router.get('/{uuid}', response_model=PersonAPI)
-@cache()
 async def person_details(
     uuid: str, person_services: RetrivalService = Depends(get_person_service),
 ) -> PersonAPI:

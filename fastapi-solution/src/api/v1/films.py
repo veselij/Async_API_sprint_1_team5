@@ -34,7 +34,6 @@ async def popular_films(
 
 
 @router.get('/{uuid}', response_model=FilmAPI)
-@cache()
 async def film_details(
     uuid: str,
     film_service: RetrivalService = Depends(get_film_service),

@@ -19,7 +19,7 @@ async def test_person_by_uuid(
     await prepare_es_index("testdata/persons.json")
     await populate_index("testdata/persons_data.json")
 
-    response = make_get_request(
+    response = await make_get_request(
         f'http://{config.api_ip}:8000/api/v1/persons/{uuid}'
     )
 
@@ -40,7 +40,7 @@ async def test_person_films(
     await prepare_es_index("testdata/persons.json")
     await populate_index("testdata/persons_data.json")
 
-    response = make_get_request(
+    response = await make_get_request(
         f'http://{config.api_ip}:8000/api/v1/persons/01377f6d-9767-48ce-9e37-3c81f8a3c739/films'
     )
 
@@ -65,7 +65,7 @@ async def test_person_search(
     await prepare_es_index("testdata/persons.json")
     await populate_index("testdata/persons_data.json")
 
-    response = make_get_request(
+    response = await make_get_request(
         f'http://{config.api_ip}:8000/api/v1/persons/search/?query=Woody'
     )
 
@@ -91,30 +91,30 @@ async def test_person_cashe(
     await prepare_es_index("testdata/persons.json")
     await populate_index("testdata/persons_data.json")
 
-    response = make_get_request(
+    response = await make_get_request(
         f'http://{config.api_ip}:8000/api/v1/persons/01377f6d-9767-48ce-9e37-3c81f8a3c739'
     )
 
     assert response.status == 200
-    assert response.body == [{
+    assert response.body == {
         "uuid":"01377f6d-9767-48ce-9e37-3c81f8a3c739",
         "full_name":"Woody Harrelson",
         "role":"actor",
         "film_ids":["57beb3fd-b1c9-4f8a-9c06-2da13f95251c,2a090dde-f688-46fe-a9f4-b781a985275e"]
-    }]
+    }
 
 
     await es_client.options(ignore_status=[404]).indices.delete(index="movies")
     assert not await es_client.indices.exists(index="movies")
 
-    response = make_get_request(
+    response = await make_get_request(
         f'http://{config.api_ip}:8000/api/v1/persons/01377f6d-9767-48ce-9e37-3c81f8a3c739'
     )
 
     assert response.status == 200
-    assert response.body == [{
+    assert response.body == {
         "uuid":"01377f6d-9767-48ce-9e37-3c81f8a3c739",
         "full_name":"Woody Harrelson",
         "role":"actor",
         "film_ids":["57beb3fd-b1c9-4f8a-9c06-2da13f95251c,2a090dde-f688-46fe-a9f4-b781a985275e"]
-    }]
+    }

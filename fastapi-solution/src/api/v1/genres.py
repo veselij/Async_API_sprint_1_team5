@@ -27,7 +27,6 @@ async def get_genres(
 
 
 @router.get('/{uuid}', response_model=GenreAPI)
-@cache()
 async def genre_details(
     uuid: str, genre_services: RetrivalService = Depends(get_genre_service),
 ) -> GenreAPI:

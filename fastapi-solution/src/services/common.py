@@ -26,7 +26,7 @@ class ElasticDataBaseManager(DataBaseManager):
     def __init__(self, elastic: AsyncElasticsearch) -> None:
         self.elastic = elastic
 
-    @backoff.on_exception(backoff.expo, (es_exceptions.ConnectionTimeout, es_exceptions.ConnectionError), max_tries=3)
+    @backoff.on_exception(backoff.expo, (es_exceptions.ConnectionTimeout, es_exceptions.ConnectionError), max_time=60)
     async def get_obj_from_db_by_id(self, obj_id: str, table_name: str) -> Optional[dict]:
         try:
             doc = await self.elastic.get(index=table_name, id=obj_id)
@@ -34,7 +34,7 @@ class ElasticDataBaseManager(DataBaseManager):
             return None
         return doc['_source']
 
-    @backoff.on_exception(backoff.expo, (es_exceptions.ConnectionTimeout, es_exceptions.ConnectionError), max_tries=3)
+    @backoff.on_exception(backoff.expo, (es_exceptions.ConnectionTimeout, es_exceptions.ConnectionError), max_time=60)
     async def get_objs_by_query(self, table_name: str, **kwargs) -> Optional[list[dict]]:
         if kwargs.get('sort', None) is not None and kwargs['sort'].startswith('-'):
             kwargs['sort'] = "{0}:desc".format(kwargs['sort'][1:])
@@ -63,14 +63,14 @@ class RedisCache(BaseCache):
     def __init__(self, redis: Redis) -> None:
         self.redis = redis
 
-    @backoff.on_exception(backoff.expo, (aioredis.ConnectionClosedError), max_tries=3)
+    @backoff.on_exception(backoff.expo, (aioredis.ConnectionClosedError), max_time=60)
     async def get_obj_from_cache(self, obj_id: str) -> Optional[str]:
         data = await self.redis.get(obj_id)
         if not data:
             return None
         return data
 
-    @backoff.on_exception(backoff.expo, (aioredis.ConnectionClosedError), max_tries=3)
+    @backoff.on_exception(backoff.expo, (aioredis.ConnectionClosedError), max_time=60)
     async def put_obj_to_cache(self, key: str, obj: str) -> None:
         await self.redis.set(key, obj, expire=self.cache_timer)
 

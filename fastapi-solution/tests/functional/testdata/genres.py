@@ -6,18 +6,18 @@ genre_pagination_wrong_params = [
 ]
 
 
-genre_test_data = [
+genre_pagination_test_data = [
     (1, 1, 1, 200),
     (1, 2, 2, 200),
-    (1, 10, 10, 200),
+    (1, 10, 3, 200),
 ]
 
 with open('testdata/genres_data.json', 'r') as f:
             data = json.load(f)
 
 genre_info_by_uuid_test = [
-    ('2a090dde-f688-46fe-a9f4-b781a985275e', data[0]),
-    ('05d7341e-e367-4e2e-acf5-4652a8435f93', data[1]),
-    ('15d7341e-e367-4e2e-acf5-4652a8435f93', data[2]),
+    ('3d8d9bf5-0d90-4353-88ba-4ccc5d2c07ff', data[0]),
+    ('120a21cf-9097-479e-904a-13dd7198c1dd', data[1]),
+    ('b92ef010-5e4c-4fd0-99d6-41b6456272cd', data[2]),
 ]
 

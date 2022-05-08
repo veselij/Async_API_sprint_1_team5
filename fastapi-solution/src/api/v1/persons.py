@@ -15,7 +15,6 @@ router = APIRouter()
 
 
 @router.get('/{uuid}', response_model=PersonAPI)
-@cache()
 async def person_details(
     uuid: str, person_services: RetrivalService = Depends(get_person_service),
 ) -> PersonAPI:
@@ -28,14 +27,14 @@ async def person_details(
 @router.get('/{uuid}/films/', response_model=list[ShortFilmAPI])
 @cache()
 async def person_films(
-    query: str,
+    uuid: str,
     page_num: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1),
     film_service: RetrivalService = Depends(get_short_film_service),
 ) -> list[ShortFilmAPI]:
     starting_doc = (page_num - 1) * page_size
     films = await film_service.get_by_query(
-        size=page_size, from_=starting_doc, **get_query_films_by_person(query),
+        size=page_size, from_=starting_doc, **get_query_films_by_person(uuid),
     )
     if not films:
         raise HTTPException(

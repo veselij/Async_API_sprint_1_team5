@@ -16,7 +16,7 @@ async def test_films_main_page_wrong_sort(sort, make_get_request, clear_redis):
     assert response.body == {"detail": "Films not found"}
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize('params,result', film_pagination_wrong_params)
+@pytest.mark.parametrize('params,results', film_pagination_wrong_params)
 async def test_films_pagination_wrong_params(params, results, make_get_request, clear_redis):
 
     response = await make_get_request(f'http://{config.api_ip}:8000/api/v1/films/{params}')
@@ -36,7 +36,7 @@ async def test_films_pagination(page_num, page_size, results_len, status_code, m
     assert len(response) == results_len
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize('uuid, code, expected_response', film_full_info_by_uuid_test)
+@pytest.mark.parametrize('uuid, status_code, expected_response', film_full_info_by_uuid_test)
 async def test_film_full_info(
     uuid,
     status_code,
@@ -59,7 +59,7 @@ async def test_film_full_info(
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize('uuid, code, expected_response', film_full_info_by_uuid_test)
+@pytest.mark.parametrize('uuid, status_code, expected_response', film_full_info_by_uuid_test)
 async def test_film_full_info_cashe(
     uuid,
     status_code,

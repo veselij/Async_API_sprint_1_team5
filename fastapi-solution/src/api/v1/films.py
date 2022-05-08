@@ -1,3 +1,4 @@
+from enum import Enum
 from http import HTTPStatus
 from typing import Optional
 
@@ -17,7 +18,7 @@ router = APIRouter()
 @router.get('/', response_model=list[ShortFilmAPI])
 @cache()
 async def popular_films(
-    sort: str = '-imdb_rating',
+    sort: str = Query('-imdb_rating', regex="^-imdb_rating$|^imdb_rating$"),
     page_num: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1),
     genre: Optional[str] = None,

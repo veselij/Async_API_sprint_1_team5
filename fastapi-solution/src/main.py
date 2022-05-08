@@ -8,7 +8,7 @@ from core import config
 from db import elastic, redis
 
 app = FastAPI(
-    title="Read-only API для онлайн-кинотеатра",
+    title="API для онлайн-кинотеатра",
     description="Информация о фильмах, жанрах и людях, участвовавших в создании произведения",
     version="1.0.0",
     docs_url="/api/openapi",
@@ -31,7 +31,7 @@ async def shutdown():
     await elastic.es.close()
 
 
-app.include_router(films.router, prefix="/api/v1/films", tags=["film"])
-app.include_router(genres.router, prefix="/api/v1/genres", tags=["genre"])
-app.include_router(persons.router, prefix="/api/v1/persons", tags=["person"])
+app.include_router(films.router, prefix="/api/v1/films", tags=["Фильмы"])
+app.include_router(genres.router, prefix="/api/v1/genres", tags=["Жанры"])
+app.include_router(persons.router, prefix="/api/v1/persons", tags=["Персоны"])
 

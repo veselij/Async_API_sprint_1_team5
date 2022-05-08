@@ -17,10 +17,9 @@ router = APIRouter()
 @router.get(
     '/{uuid}',
     response_model=PersonAPI,
-    summary="Персоны",
+    summary="все персоны",
     description="Поиск персоны по идентификатору",
     response_description="ФИО, роль и фильмы, в которых принимал участие",
-    tags=['Персоны'],
 )
 @cache()
 async def person_details(
@@ -35,10 +34,9 @@ async def person_details(
 @router.get(
     '/{uuid}/films/',
     response_model=list[ShortFilmAPI],
-    summary="Персоны",
+    summary="фильмы по персоне",
     description="Поиск фильмов в которых принимала участие персона",
     response_description="Название и рейтинг фильма",
-    tags=['Персоны'],
 )
 @cache()
 async def person_films(
@@ -62,10 +60,9 @@ async def person_films(
 @router.get(
     '/search/',
     response_model=list[PersonAPI],
-    summary="Персоны",
+    summary="поиск персоны",
     description="Полнотекстовый поиск по персонам",
     response_description="ФИО, роль и фильмы, в которых принимала участие",
-    tags=['Персоны'],
 )
 @cache()
 async def person_search(

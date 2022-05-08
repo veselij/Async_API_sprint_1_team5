@@ -15,10 +15,9 @@ router = APIRouter()
 @router.get(
     '/',
     response_model=list[GenreAPI],
-    summary="Жанры",
+    summary="все жанры",
     description="Постраничный вывод жанров",
     response_description="Название и описание жанра",
-    tags=['Жанры'],
 )
 @cache()
 async def get_genres(
@@ -36,10 +35,9 @@ async def get_genres(
 @router.get(
     '/{uuid}',
     response_model=GenreAPI,
-    summary="Жанры",
+    summary="жанр по uuid",
     description="Поиск жанра по идентификатору",
     response_description="Название и описание жанра",
-    tags=['Жанры'],
 )
 @cache()
 async def genre_details(

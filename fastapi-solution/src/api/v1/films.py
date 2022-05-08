@@ -1,4 +1,3 @@
-from enum import Enum
 from http import HTTPStatus
 from typing import Optional
 
@@ -18,10 +17,9 @@ router = APIRouter()
 @router.get(
     '/', 
     response_model=list[ShortFilmAPI],
-    summary="Фильмы",
+    summary="все фильмы",
     description="Вывод всех популярных кинопроизведений",
     response_description="Название и рейтинг фильма",
-    tags=['Фильмы'],
 )
 @cache()
 async def popular_films(
@@ -43,10 +41,9 @@ async def popular_films(
 @router.get(
     '/{uuid}', 
     response_model=FilmAPI,
-    summary="Фильмы",
+    summary="Фильм по uuid",
     description="Запрос фильма по его идентификатору",
     response_description="Полная информация о фильме",
-    tags=['Фильмы'],
 )
 @cache()
 async def film_details(
@@ -62,10 +59,9 @@ async def film_details(
 @router.get(
     '/search/',
     response_model=list[ShortFilmAPI],
-    summary="Поиск кинопроизведений",
+    summary="поиск фильма",
     description="Полнотекстовый поиск по кинопроизведениям",
     response_description="Название и рейтинг фильма",
-    tags=['Полнотекстовый поиск'],
 )
 @cache()
 async def films_search(

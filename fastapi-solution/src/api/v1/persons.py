@@ -14,7 +14,13 @@ from services.persons import get_person_service
 router = APIRouter()
 
 
-@router.get('/{uuid}', response_model=PersonAPI)
+@router.get(
+    '/{uuid}',
+    response_model=PersonAPI,
+    summary="все персоны",
+    description="Поиск персоны по идентификатору",
+    response_description="ФИО, роль и фильмы, в которых принимал участие",
+)
 async def person_details(
     uuid: str, person_services: RetrivalService = Depends(get_person_service),
 ) -> PersonAPI:
@@ -24,7 +30,13 @@ async def person_details(
     return PersonAPI(**person.get_api_fields())
 
 
-@router.get('/{uuid}/films/', response_model=list[ShortFilmAPI])
+@router.get(
+    '/{uuid}/films/',
+    response_model=list[ShortFilmAPI],
+    summary="фильмы по персоне",
+    description="Поиск фильмов в которых принимала участие персона",
+    response_description="Название и рейтинг фильма",
+)
 @cache()
 async def person_films(
     uuid: str,
@@ -44,7 +56,13 @@ async def person_films(
     return [ShortFilmAPI(**film.get_api_fields()) for film in films]
 
 
-@router.get('/search/', response_model=list[PersonAPI])
+@router.get(
+    '/search/',
+    response_model=list[PersonAPI],
+    summary="поиск персоны",
+    description="Полнотекстовый поиск по персонам",
+    response_description="ФИО, роль и фильмы, в которых принимала участие",
+)
 @cache()
 async def person_search(
     query: str,

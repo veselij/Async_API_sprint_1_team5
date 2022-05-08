@@ -1,4 +1,3 @@
-from enum import Enum
 from http import HTTPStatus
 from typing import Optional
 
@@ -15,7 +14,13 @@ from services.films import get_film_service, get_short_film_service
 router = APIRouter()
 
 
-@router.get('/', response_model=list[ShortFilmAPI])
+@router.get(
+    '/', 
+    response_model=list[ShortFilmAPI],
+    summary="все фильмы",
+    description="Вывод всех популярных кинопроизведений",
+    response_description="Название и рейтинг фильма",
+)
 @cache()
 async def popular_films(
     sort: str = Query('-imdb_rating', regex="^-imdb_rating$|^imdb_rating$"),
@@ -33,7 +38,13 @@ async def popular_films(
     return [ShortFilmAPI(**film.get_api_fields()) for film in films]
 
 
-@router.get('/{uuid}', response_model=FilmAPI)
+@router.get(
+    '/{uuid}', 
+    response_model=FilmAPI,
+    summary="Фильм по uuid",
+    description="Запрос фильма по его идентификатору",
+    response_description="Полная информация о фильме",
+)
 async def film_details(
     uuid: str,
     film_service: RetrivalService = Depends(get_film_service),
@@ -44,7 +55,13 @@ async def film_details(
     return FilmAPI(**film.get_api_fields())
 
 
-@router.get('/search/', response_model=list[ShortFilmAPI])
+@router.get(
+    '/search/',
+    response_model=list[ShortFilmAPI],
+    summary="поиск фильма",
+    description="Полнотекстовый поиск по кинопроизведениям",
+    response_description="Название и рейтинг фильма",
+)
 @cache()
 async def films_search(
     query: str,

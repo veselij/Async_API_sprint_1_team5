@@ -12,7 +12,14 @@ from services.genres import get_genre_service
 router = APIRouter()
 
 
-@router.get('/', response_model=list[GenreAPI])
+@router.get(
+    '/',
+    response_model=list[GenreAPI],
+    summary="Жанры",
+    description="Постраничный вывод жанров",
+    response_description="Название и описание жанра",
+    tags=['Жанры'],
+)
 @cache()
 async def get_genres(
     page_num: int = Query(1, ge=1),
@@ -26,7 +33,14 @@ async def get_genres(
     return [GenreAPI(**genre.get_api_fields()) for genre in genres]
 
 
-@router.get('/{uuid}', response_model=GenreAPI)
+@router.get(
+    '/{uuid}',
+    response_model=GenreAPI,
+    summary="Жанры",
+    description="Поиск жанра по идентификатору",
+    response_description="Название и описание жанра",
+    tags=['Жанры'],
+)
 @cache()
 async def genre_details(
     uuid: str, genre_services: RetrivalService = Depends(get_genre_service),

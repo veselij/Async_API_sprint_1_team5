@@ -15,7 +15,14 @@ from services.films import get_film_service, get_short_film_service
 router = APIRouter()
 
 
-@router.get('/', response_model=list[ShortFilmAPI])
+@router.get(
+    '/', 
+    response_model=list[ShortFilmAPI],
+    summary="Фильмы",
+    description="Вывод всех популярных кинопроизведений",
+    response_description="Название и рейтинг фильма",
+    tags=['Фильмы'],
+)
 @cache()
 async def popular_films(
     sort: str = Query('-imdb_rating', regex="^-imdb_rating$|^imdb_rating$"),
@@ -33,7 +40,14 @@ async def popular_films(
     return [ShortFilmAPI(**film.get_api_fields()) for film in films]
 
 
-@router.get('/{uuid}', response_model=FilmAPI)
+@router.get(
+    '/{uuid}', 
+    response_model=FilmAPI,
+    summary="Фильмы",
+    description="Запрос фильма по его идентификатору",
+    response_description="Полная информация о фильме",
+    tags=['Фильмы'],
+)
 @cache()
 async def film_details(
     uuid: str,
@@ -45,7 +59,14 @@ async def film_details(
     return FilmAPI(**film.get_api_fields())
 
 
-@router.get('/search/', response_model=list[ShortFilmAPI])
+@router.get(
+    '/search/',
+    response_model=list[ShortFilmAPI],
+    summary="Поиск кинопроизведений",
+    description="Полнотекстовый поиск по кинопроизведениям",
+    response_description="Название и рейтинг фильма",
+    tags=['Полнотекстовый поиск'],
+)
 @cache()
 async def films_search(
     query: str,

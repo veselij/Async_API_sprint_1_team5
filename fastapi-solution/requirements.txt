@@ -22,6 +22,8 @@ attrs==21.4.0
     #   flake8-bugbear
     #   flake8-eradicate
     #   wemake-python-styleguide
+backoff==2.0.1
+    # via -r requirements.in
 bandit==1.7.4
     # via flake8-bandit
 certifi==2021.10.8
@@ -167,4 +169,3 @@ yarl==1.7.2
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
-httptools

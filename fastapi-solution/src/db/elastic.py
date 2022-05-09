@@ -1,9 +1,9 @@
 from typing import Type
-from elasticsearch import Elasticsearch
+from elasticsearch import AsyncElasticsearch
 from elastic_transport import ConnectionError
 
-es: Elasticsearch
+es: AsyncElasticsearch
 
 
-async def get_elastic() -> tuple[Elasticsearch, Type[Exception]]:
+async def get_elastic() -> tuple[AsyncElasticsearch, Type[Exception]]:
     return es, ConnectionError

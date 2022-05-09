@@ -1,8 +1,9 @@
 from http import HTTPStatus
 
+from api.v1.pagination import PaginatedParams
 from core.decorators import cache
 from fastapi.exceptions import HTTPException
-from fastapi.param_functions import Depends, Query
+from fastapi.param_functions import Depends
 from fastapi.routing import APIRouter
 from .exceptions import GenreExceptionMessages as GEM
 from models.response_models import GenreAPI
@@ -21,12 +22,10 @@ router = APIRouter()
 )
 @cache()
 async def get_genres(
-    page_num: int = Query(1, ge=1),
-    page_size: int = Query(50, ge=1),
+    page_param: PaginatedParams = Depends(),
     genre_service: RetrivalService = Depends(get_genre_service),
 ) -> list[GenreAPI]:
-    starting_doc = (page_num - 1) * page_size
-    genres = await genre_service.get_by_query(size=page_size, from_=starting_doc)
+    genres = await genre_service.get_by_query(size=page_param.page_size, from_=page_param.get_starting_doc())
     if not genres:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=GEM.GENRES_NOT_FOUND)
     return [GenreAPI(**genre.get_api_fields()) for genre in genres]

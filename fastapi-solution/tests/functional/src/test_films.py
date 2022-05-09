@@ -1,18 +1,19 @@
 import pytest
+from http import HTTPStatus
 
 from settings import config
-from testdata.movies import film_pagination_wrong_params, film_pagination_test_data, film_full_info_by_uuid_test
+from testdata.movies import film_pagination_wrong_params, film_pagination_test_data, film_full_info_by_uuid_test, test_wrong_sort_data
 
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize('sort', ['', 'Test'])
-async def test_films_main_page_wrong_sort(sort, make_get_request, clear_redis):
+@pytest.mark.parametrize('sort,result', test_wrong_sort_data)
+async def test_films_main_page_wrong_sort(sort, result, make_get_request, clear_redis):
 
     response = await make_get_request(f'http://{config.api_ip}:8000/api/v1/films/?sort={sort}')
 
-    assert response.status == 422
-    assert response.body == {"detail":[{"loc":["query","sort"],"msg":"string does not match regex \"^-imdb_rating$|^imdb_rating$\"","type":"value_error.str.regex","ctx":{"pattern":"^-imdb_rating$|^imdb_rating$"}}]}
+    assert response.status == HTTPStatus.UNPROCESSABLE_ENTITY
+    assert response.body == result
 
 
 @pytest.mark.asyncio
@@ -21,7 +22,7 @@ async def test_films_pagination_wrong_params(params, results, make_get_request, 
 
     response = await make_get_request(f'http://{config.api_ip}:8000/api/v1/films/{params}')
 
-    assert response.status == 422
+    assert response.status == HTTPStatus.UNPROCESSABLE_ENTITY
     assert response.body == results
 
 

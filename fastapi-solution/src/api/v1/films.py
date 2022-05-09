@@ -2,6 +2,7 @@ from http import HTTPStatus
 from typing import Optional
 
 from api.v1.queries import get_query_film_by_genre, get_query_film_search
+from api.v1.pagination import PaginatedParams
 from core.decorators import cache
 from .exceptions import FilmExceptionMessages as FEM
 from fastapi.exceptions import HTTPException
@@ -23,15 +24,13 @@ router = APIRouter()
 )
 @cache()
 async def popular_films(
+    page_param: PaginatedParams = Depends(),
     sort: str = Query('-imdb_rating', regex="^-imdb_rating$|^imdb_rating$"),
-    page_num: int = Query(1, ge=1),
-    page_size: int = Query(50, ge=1),
     genre: Optional[str] = None,
     film_service: RetrivalService = Depends(get_short_film_service),
 ) -> list[ShortFilmAPI]:
-    starting_doc = (page_num - 1) * page_size
     films = await film_service.get_by_query(
-        sort=sort, size=page_size, from_=starting_doc, **get_query_film_by_genre(genre),
+        sort=sort, size=page_param.page_size, from_=page_param.get_starting_doc(), **get_query_film_by_genre(genre),
     )
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILMS_NOT_FOUND)
@@ -65,13 +64,11 @@ async def film_details(
 @cache()
 async def films_search(
     query: str,
-    page_num: int = Query(1, ge=1),
-    page_size: int = Query(50, ge=1),
+    page_param: PaginatedParams = Depends(),
     film_service: RetrivalService = Depends(get_short_film_service),
 ) -> list[ShortFilmAPI]:
-    starting_doc = (page_num - 1) * page_size
     films = await film_service.get_by_query(
-        size=page_size, from_=starting_doc, **get_query_film_search(query),
+        size=page_param.page_size, from_=page_param.get_starting_doc(), **get_query_film_search(query),
     )
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILMS_NOT_FOUND)

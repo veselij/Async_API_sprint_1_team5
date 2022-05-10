@@ -1,18 +1,17 @@
 from functools import lru_cache
+from typing import Type
 
-from aioredis import Redis
 from db.elastic import get_elastic
 from db.redis import get_redis
-from elasticsearch import AsyncElasticsearch
 from fastapi.param_functions import Depends
 from models.common import Genre
 
-from services.common import ElasticDataBaseManager, RedisCache, RetrivalService
+from services.common import DataBaseManager, Cache, RetrivalService, AbstractCache, AbstractDatabase
 
 
 @lru_cache()
 def get_genre_service(
-        redis: Redis = Depends(get_redis),
-        elastic: AsyncElasticsearch = Depends(get_elastic),
+        cache: tuple[AbstractCache, Type[Exception]] = Depends(get_redis),
+        db: tuple[AbstractDatabase, Type[Exception]] = Depends(get_elastic),
 ) -> RetrivalService:
-    return RetrivalService(RedisCache(redis), ElasticDataBaseManager(elastic), Genre, 'genres')
+    return RetrivalService(Cache(*cache), DataBaseManager(*db), Genre, 'genres')

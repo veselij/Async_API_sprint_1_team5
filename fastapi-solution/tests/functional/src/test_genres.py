@@ -1,4 +1,5 @@
 import pytest
+from http import HTTPStatus
 
 from settings import config
 from testdata.genres import genre_pagination_wrong_params, genre_pagination_test_data, genre_info_by_uuid_test
@@ -12,7 +13,7 @@ async def test_genre_pagination_wrong_params(params, results, make_get_request, 
         f'http://{config.api_ip}:8000/api/v1/genres/{params}'
     )
 
-    assert response.status == 422
+    assert response.status == HTTPStatus.UNPROCESSABLE_ENTITY
     assert response.body == results
 
 
@@ -57,11 +58,15 @@ async def test_genre_by_uuid(
         f'http://{config.api_ip}:8000/api/v1/genres/{uuid}'
     )
 
-    assert response.status == 200
+    assert response.status == HTTPStatus.OK
     assert response.body == result
 
+
 @pytest.mark.asyncio
+@pytest.mark.parametrize('uuid,result', genre_info_by_uuid_test)
 async def test_genre_cashe(
+    uuid,
+    result,
     make_get_request,
     prepare_es_index,
     populate_index,
@@ -73,29 +78,21 @@ async def test_genre_cashe(
     await populate_index("testdata/genres_data.json")
 
     response = await make_get_request(
-        f'http://{config.api_ip}:8000/api/v1/genres/3d8d9bf5-0d90-4353-88ba-4ccc5d2c07ff'
+        f'http://{config.api_ip}:8000/api/v1/genres/{uuid}'
     )
 
-    assert response.status == 200
-    assert response.body == {
-        "uuid": "3d8d9bf5-0d90-4353-88ba-4ccc5d2c07ff",
-        "name": "Action",
-        "description": ""
-    }
+    assert response.status == HTTPStatus.OK
+    assert response.body == result
 
 
     await es_client.options(ignore_status=[404]).indices.delete(index="movies")
     assert not await es_client.indices.exists(index="movies")
 
     response = await make_get_request(
-        f'http://{config.api_ip}:8000/api/v1/genres/3d8d9bf5-0d90-4353-88ba-4ccc5d2c07ff'
+        f'http://{config.api_ip}:8000/api/v1/genres/{uuid}'
     )
 
-    assert response.status == 200
-    assert response.body == {
-        "uuid": "3d8d9bf5-0d90-4353-88ba-4ccc5d2c07ff",
-        "name": "Action",
-        "description": ""
-    }
+    assert response.status == HTTPStatus.OK
+    assert response.body == result
 
 

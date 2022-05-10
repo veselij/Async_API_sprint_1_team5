@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from api.v1.queries import get_query_films_by_person, get_query_person_search
+from api.v1.pagination import PaginatedParams
 from core.decorators import cache
 from .exceptions import PersonExceptionMessages as PEM
 from fastapi.exceptions import HTTPException
@@ -40,13 +41,11 @@ async def person_details(
 @cache()
 async def person_films(
     uuid: str,
-    page_num: int = Query(1, ge=1),
-    page_size: int = Query(50, ge=1),
+    page_param: PaginatedParams = Depends(),
     film_service: RetrivalService = Depends(get_short_film_service),
 ) -> list[ShortFilmAPI]:
-    starting_doc = (page_num - 1) * page_size
     films = await film_service.get_by_query(
-        size=page_size, from_=starting_doc, **get_query_films_by_person(uuid),
+        size=page_param.page_size, from_=page_param.get_starting_doc(), **get_query_films_by_person(uuid),
     )
     if not films:
         raise HTTPException(
@@ -66,13 +65,11 @@ async def person_films(
 @cache()
 async def person_search(
     query: str,
-    page_num: int = Query(1, ge=1),
-    page_size: int = Query(50, ge=1),
+    page_param: PaginatedParams = Depends(),
     person_service: RetrivalService = Depends(get_person_service),
 ) -> list[PersonAPI]:
-    starting_doc = (page_num - 1) * page_size
     persons = await person_service.get_by_query(
-        size=page_size, from_=starting_doc, **get_query_person_search(query),
+        size=page_param.page_size, from_=page_param.get_starting_doc(), **get_query_person_search(query),
     )
     if not persons:
         raise HTTPException(

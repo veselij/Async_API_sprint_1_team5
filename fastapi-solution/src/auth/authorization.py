@@ -20,4 +20,5 @@ class TokenCheck(HTTPBearer):
     async def send_request_to_auth(self, token: str) -> list:
         async with httpx.AsyncClient() as client:
             response = await client.post(f"http://{config.AUTH_HOST}:{config.AUTH_PORT}/user/check", json={"access_token": token})
+            print(response)
         return response.json()

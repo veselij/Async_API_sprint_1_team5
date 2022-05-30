@@ -18,7 +18,38 @@ def get_query_film_by_genre(genre: Optional[str]) -> dict[str, Any]:
     return {"query": None}
 
 
-def get_query_film_search(search_word: str) -> dict[str, Any]:
+def get_query_film_search(search_word: str, person: str) -> dict[str, Any]:
+    return {
+        "query": {
+            "bool": {
+                "must":
+                {
+                    "multi_match": {
+                        "query": search_word,
+                        "fuzziness": "auto",
+                        "fields": [
+                            "title",
+                            "description"
+                        ]
+                    }
+                },
+                "filter": 
+                    {
+                        "nested": {
+                            "path": "actors",
+                            "query": {
+                                "term": {
+                                        "actors.uuid": person
+                                }
+                            }
+                        }
+                    },
+    }
+}
+        }
+
+
+def _get_query_film_search(search_word: str) -> dict[str, Any]:
     return {
         "query": {
             "multi_match": {

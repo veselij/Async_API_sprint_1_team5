@@ -81,7 +81,6 @@ def backoff_async(logger: logging.Logger, start_sleep_time: float = 0.1, factor:
             while True:
                 try:
                     func_result = await func(*args, **kwargs)
-                    print("connect attempts")
                 except RetryExceptionError as e:
                     logger.exception(e)
                     delay = next(delays)

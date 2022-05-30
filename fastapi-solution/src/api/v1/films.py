@@ -11,6 +11,7 @@ from fastapi.routing import APIRouter
 from models.response_models import FilmAPI, ShortFilmAPI
 from services.common import RetrivalService
 from services.films import get_film_service, get_short_film_service
+from auth.authorization import TokenCheck
 
 router = APIRouter()
 
@@ -28,7 +29,9 @@ async def popular_films(
     sort: str = Query('-imdb_rating', regex="^-imdb_rating$|^imdb_rating$"),
     genre: Optional[str] = None,
     film_service: RetrivalService = Depends(get_short_film_service),
+    roles: list = Depends(TokenCheck())
 ) -> list[ShortFilmAPI]:
+    print('ROLESSSS', roles)
     films = await film_service.get_by_query(
         sort=sort, size=page_param.page_size, from_=page_param.get_starting_doc(), **get_query_film_by_genre(genre),
     )
@@ -68,7 +71,7 @@ async def films_search(
     film_service: RetrivalService = Depends(get_short_film_service),
 ) -> list[ShortFilmAPI]:
     films = await film_service.get_by_query(
-        size=page_param.page_size, from_=page_param.get_starting_doc(), **get_query_film_search(query),
+        size=page_param.page_size, from_=page_param.get_starting_doc(), **get_query_film_search(query, "e7448447-64a6-4f63-b37c-39b002b4ef20"),
     )
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILMS_NOT_FOUND)

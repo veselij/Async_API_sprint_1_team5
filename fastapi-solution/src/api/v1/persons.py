@@ -16,14 +16,15 @@ router = APIRouter()
 
 
 @router.get(
-    '/{uuid}',
+    "/{uuid}",
     response_model=PersonAPI,
     summary="все персоны",
     description="Поиск персоны по идентификатору",
     response_description="ФИО, роль и фильмы, в которых принимал участие",
 )
 async def person_details(
-    uuid: str, person_services: RetrivalService = Depends(get_person_service),
+    uuid: str,
+    person_services: RetrivalService = Depends(get_person_service),
 ) -> PersonAPI:
     person = await person_services.get_by_id(uuid)
     if not person:
@@ -32,7 +33,7 @@ async def person_details(
 
 
 @router.get(
-    '/{uuid}/films/',
+    "/{uuid}/films/",
     response_model=list[ShortFilmAPI],
     summary="фильмы по персоне",
     description="Поиск фильмов в которых принимала участие персона",
@@ -45,18 +46,20 @@ async def person_films(
     film_service: RetrivalService = Depends(get_short_film_service),
 ) -> list[ShortFilmAPI]:
     films = await film_service.get_by_query(
-        size=page_param.page_size, from_=page_param.get_starting_doc(), **get_query_films_by_person(uuid),
+        size=page_param.page_size,
+        from_=page_param.get_starting_doc(),
+        **get_query_films_by_person(uuid),
     )
     if not films:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail=PEM.PERSON_DOES_NOT_EXIST + ' or ' + PEM.PERSON_DOES_NOT_HAVE_FILMS,
+            detail=PEM.PERSON_DOES_NOT_EXIST + " or " + PEM.PERSON_DOES_NOT_HAVE_FILMS,
         )
     return [ShortFilmAPI(**film.get_api_fields()) for film in films]
 
 
 @router.get(
-    '/search/',
+    "/search/",
     response_model=list[PersonAPI],
     summary="поиск персоны",
     description="Полнотекстовый поиск по персонам",
@@ -69,10 +72,13 @@ async def person_search(
     person_service: RetrivalService = Depends(get_person_service),
 ) -> list[PersonAPI]:
     persons = await person_service.get_by_query(
-        size=page_param.page_size, from_=page_param.get_starting_doc(), **get_query_person_search(query),
+        size=page_param.page_size,
+        from_=page_param.get_starting_doc(),
+        **get_query_person_search(query),
     )
     if not persons:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail=PEM.PERSON_NOT_FOUND,
+            status_code=HTTPStatus.NOT_FOUND,
+            detail=PEM.PERSON_NOT_FOUND,
         )
     return [PersonAPI(**person.get_api_fields()) for person in persons]

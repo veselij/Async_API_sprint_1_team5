@@ -4,5 +4,3 @@ class RetryExceptionError(Exception):
     def __init__(self, messsage) -> None:
         self.messsage = messsage
         super().__init__(self.messsage)
-
-

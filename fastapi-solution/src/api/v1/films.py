@@ -17,7 +17,7 @@ router = APIRouter()
 
 
 @router.get(
-    '/', 
+    "/",
     response_model=list[ShortFilmAPI],
     summary="все фильмы",
     description="Вывод всех популярных кинопроизведений",
@@ -26,14 +26,17 @@ router = APIRouter()
 @cache()
 async def popular_films(
     page_param: PaginatedParams = Depends(),
-    sort: str = Query('-imdb_rating', regex="^-imdb_rating$|^imdb_rating$"),
+    sort: str = Query("-imdb_rating", regex="^-imdb_rating$|^imdb_rating$"),
     genre: Optional[str] = None,
     film_service: RetrivalService = Depends(get_short_film_service),
-    roles: list = Depends(TokenCheck())
+    roles: list = Depends(TokenCheck()),
 ) -> list[ShortFilmAPI]:
-    print('ROLESSSS', roles)
+    print("ROLESSSS", roles)
     films = await film_service.get_by_query(
-        sort=sort, size=page_param.page_size, from_=page_param.get_starting_doc(), **get_query_film_by_genre(genre),
+        sort=sort,
+        size=page_param.page_size,
+        from_=page_param.get_starting_doc(),
+        **get_query_film_by_genre(genre),
     )
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILMS_NOT_FOUND)
@@ -41,7 +44,7 @@ async def popular_films(
 
 
 @router.get(
-    '/{uuid}', 
+    "/{uuid}",
     response_model=FilmAPI,
     summary="Фильм по uuid",
     description="Запрос фильма по его идентификатору",
@@ -58,7 +61,7 @@ async def film_details(
 
 
 @router.get(
-    '/search/',
+    "/search/",
     response_model=list[ShortFilmAPI],
     summary="поиск фильма",
     description="Полнотекстовый поиск по кинопроизведениям",
@@ -71,7 +74,9 @@ async def films_search(
     film_service: RetrivalService = Depends(get_short_film_service),
 ) -> list[ShortFilmAPI]:
     films = await film_service.get_by_query(
-        size=page_param.page_size, from_=page_param.get_starting_doc(), **get_query_film_search(query, "e7448447-64a6-4f63-b37c-39b002b4ef20"),
+        size=page_param.page_size,
+        from_=page_param.get_starting_doc(),
+        **get_query_film_search(query, "e7448447-64a6-4f63-b37c-39b002b4ef20"),
     )
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILMS_NOT_FOUND)

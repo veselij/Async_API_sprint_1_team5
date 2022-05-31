@@ -9,8 +9,7 @@ def orjson_dumps(v, *, default):
     return orjson.dumps(v, default=default).decode()
 
 
-class ConfigMixin():
-
+class ConfigMixin:
     class Config:
         json_loads = orjson.loads
         json_dumps = orjson_dumps
@@ -37,24 +36,23 @@ class Film(BaseModel):
 
     def get_api_fields(self) -> dict:
         return {
-            'uuid': self.uuid,
-            'title': self.title,
-            'description': self.description,
-            'imdb_rating': self.imdb_rating,
-            'genre': self.genre,
-            'actors': self.actors,
-            'writers': self.writers,
-            'directors': self.directors,
+            "uuid": self.uuid,
+            "title": self.title,
+            "description": self.description,
+            "imdb_rating": self.imdb_rating,
+            "genre": self.genre,
+            "actors": self.actors,
+            "writers": self.writers,
+            "directors": self.directors,
         }
 
 
 class ShortFilm(Film):
-
     def get_api_fields(self) -> dict:
         return {
-            'uuid': self.uuid,
-            'title': self.title,
-            'imdb_rating': self.imdb_rating,
+            "uuid": self.uuid,
+            "title": self.title,
+            "imdb_rating": self.imdb_rating,
         }
 
 
@@ -65,9 +63,9 @@ class Genre(BaseModel):
 
     def get_api_fields(self) -> dict:
         return {
-            'uuid': self.uuid,
-            'name': self.name,
-            'description': self.description,
+            "uuid": self.uuid,
+            "name": self.name,
+            "description": self.description,
         }
 
 
@@ -79,8 +77,8 @@ class Person(BaseModel):
 
     def get_api_fields(self) -> dict:
         return {
-            'uuid': self.uuid,
-            'full_name': self.full_name,
-            'role': self.role,
-            'film_ids': self.film_ids,
+            "uuid": self.uuid,
+            "full_name": self.full_name,
+            "role": self.role,
+            "film_ids": self.film_ids,
         }

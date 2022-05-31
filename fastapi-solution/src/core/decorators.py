@@ -3,6 +3,7 @@ import hashlib
 import json
 import logging
 from functools import wraps
+from typing import Optional
 
 from core.exceptions import RetryExceptionError
 from db import redis
@@ -65,7 +66,13 @@ def expo(start_sleep_time, factor, border_sleep_time):
         sequence_element += 1
 
 
-def backoff_async(logger: logging.Logger, start_sleep_time: float = 0.1, factor: int = 2, border_sleep_time: int = 10):
+def backoff_async(
+    logger: logging.Logger,
+    start_sleep_time: float = 0.1,
+    factor: int = 2,
+    border_sleep_time: int = 10,
+    max_retray: Optional[int] = None,
+):
     """Repeat function with exponential delay in case it raises RetryException.
 
     Args:
@@ -73,12 +80,14 @@ def backoff_async(logger: logging.Logger, start_sleep_time: float = 0.1, factor:
         factor: int exponential factor
         border_sleep_time: int exponential limit
     """
+
     def func_wrapper(func):
         @wraps(func)
         async def inner(*args, **kwargs):
             delays = expo(start_sleep_time, factor, border_sleep_time)
             func_result = None
-            while True:
+            max_attepmts = max_retray or float("inf")
+            while max_attepmts > 0:
                 try:
                     func_result = await func(*args, **kwargs)
                 except RetryExceptionError as e:
@@ -87,6 +96,9 @@ def backoff_async(logger: logging.Logger, start_sleep_time: float = 0.1, factor:
                 else:
                     break
                 asyncio.sleep(delay)
+                max_attepmts -= 1
             return func_result
+
         return inner
+
     return func_wrapper

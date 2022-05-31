@@ -6,8 +6,7 @@ from fastapi.param_functions import Depends
 from db.elastic import get_elastic
 from db.redis import get_redis
 from models.common import Film, ShortFilm
-from services.common import (AbstractCache, AbstractDatabase, Cache,
-                             DataBaseManager, RetrivalService)
+from services.common import AbstractCache, AbstractDatabase, Cache, DataBaseManager, RetrivalService
 
 
 @lru_cache()

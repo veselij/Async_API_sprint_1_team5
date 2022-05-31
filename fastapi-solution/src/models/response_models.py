@@ -31,4 +31,3 @@ class PersonAPI(BaseModel, ConfigMixin):
     full_name: str
     role: str
     film_ids: Optional[list[str]]
-    

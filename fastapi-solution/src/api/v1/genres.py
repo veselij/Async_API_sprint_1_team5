@@ -14,7 +14,7 @@ router = APIRouter()
 
 
 @router.get(
-    '/',
+    "/",
     response_model=list[GenreAPI],
     summary="все жанры",
     description="Постраничный вывод жанров",
@@ -32,14 +32,15 @@ async def get_genres(
 
 
 @router.get(
-    '/{uuid}',
+    "/{uuid}",
     response_model=GenreAPI,
     summary="жанр по uuid",
     description="Поиск жанра по идентификатору",
     response_description="Название и описание жанра",
 )
 async def genre_details(
-    uuid: str, genre_services: RetrivalService = Depends(get_genre_service),
+    uuid: str,
+    genre_services: RetrivalService = Depends(get_genre_service),
 ) -> GenreAPI:
     genre = await genre_services.get_by_id(uuid)
     if not genre:

@@ -15,7 +15,6 @@ logger.addHandler(fh)
 
 
 class AbstractDatabase(ABC):
-
     @abstractmethod
     async def get(self, *args, **kwargs) -> dict:
         pass
@@ -26,7 +25,6 @@ class AbstractDatabase(ABC):
 
 
 class AbstractCache(ABC):
-
     @abstractmethod
     async def get(self, *args, **kwargs) -> str:
         pass
@@ -37,7 +35,6 @@ class AbstractCache(ABC):
 
 
 class DataBaseManager:
-
     def __init__(self, db: AbstractDatabase, retry_exception: Type[Exception]) -> None:
         self.db = db
         self.retry_exception = retry_exception
@@ -49,22 +46,22 @@ class DataBaseManager:
         except self.retry_exception:
             raise RetryExceptionError("database not available")
 
-        if '_source' not in doc:
+        if "_source" not in doc:
             return None
-        return doc['_source']
+        return doc["_source"]
 
     @backoff_async(logger, start_sleep_time=0.1, factor=2, border_sleep_time=10)
     async def get_objs_by_query(self, table_name: str, **kwargs) -> Optional[list[dict]]:
-        if kwargs.get('sort', None) is not None and kwargs['sort'].startswith('-'):
-            kwargs['sort'] = "{0}:desc".format(kwargs['sort'][1:])
+        if kwargs.get("sort", None) is not None and kwargs["sort"].startswith("-"):
+            kwargs["sort"] = "{0}:desc".format(kwargs["sort"][1:])
         try:
             docs = await self.db.search(index=table_name, **kwargs)
         except self.retry_exception:
             raise RetryExceptionError("database not available")
 
-        if 'hits' not in docs:
+        if "hits" not in docs:
             return None
-        return [fields['_source'] for fields in docs['hits']['hits']]
+        return [fields["_source"] for fields in docs["hits"]["hits"]]
 
 
 class Cache:
@@ -95,7 +92,6 @@ class Cache:
 
 
 class RetrivalService:
-
     def __init__(self, cache: Cache, db_manager: DataBaseManager, base_obj: Type[BaseModel], index_name: str):
         self.cache = cache
         self.db_manager = db_manager

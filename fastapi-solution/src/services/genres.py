@@ -11,7 +11,7 @@ from services.common import DataBaseManager, Cache, RetrivalService, AbstractCac
 
 @lru_cache()
 def get_genre_service(
-        cache: tuple[AbstractCache, Type[Exception]] = Depends(get_redis),
-        db: tuple[AbstractDatabase, Type[Exception]] = Depends(get_elastic),
+    cache: tuple[AbstractCache, Type[Exception]] = Depends(get_redis),
+    db: tuple[AbstractDatabase, Type[Exception]] = Depends(get_elastic),
 ) -> RetrivalService:
-    return RetrivalService(Cache(*cache), DataBaseManager(*db), Genre, 'genres')
+    return RetrivalService(Cache(*cache), DataBaseManager(*db), Genre, "genres")

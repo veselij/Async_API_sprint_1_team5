@@ -60,9 +60,9 @@ async def film_details(
     film = await film_service.get_by_id(uuid)
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILM_NOT_FOUND)
-    print(film.subscription)
-    print(list(set(subscriptions) & set(film.subscription)))
-    if not film.subscription or list(set(subscriptions) & set(film.subscription)):
+    if not film.subscription or list(
+        set(subscriptions) & set([s.name for s in film.subscription])
+    ):
         return FilmAPI(**film.get_api_fields())
     raise HTTPException(
         status_code=HTTPStatus.UNAUTHORIZED, detail=FEM.FILM_NOT_ALLOWED

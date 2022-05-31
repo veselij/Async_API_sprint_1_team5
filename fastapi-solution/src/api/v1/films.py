@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from re import sub
 from typing import Optional
 
 from api.v1.queries import get_query_film_by_genre, get_query_film_search
@@ -72,11 +73,12 @@ async def films_search(
     query: str,
     page_param: PaginatedParams = Depends(),
     film_service: RetrivalService = Depends(get_short_film_service),
+    subscriptions: list = Depends(TokenCheck()),
 ) -> list[ShortFilmAPI]:
     films = await film_service.get_by_query(
         size=page_param.page_size,
         from_=page_param.get_starting_doc(),
-        **get_query_film_search(query, "e7448447-64a6-4f63-b37c-39b002b4ef20"),
+        **get_query_film_search(query, subscriptions),
     )
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILMS_NOT_FOUND)

@@ -61,7 +61,7 @@ async def film_details(
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILM_NOT_FOUND)
     if not film.subscription or list(
-        set(subscriptions) & set([s.name for s in film.subscription])
+        set(subscriptions) & set([s["name"] for s in film.subscription])
     ):
         return FilmAPI(**film.get_api_fields())
     raise HTTPException(

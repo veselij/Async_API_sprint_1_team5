@@ -1,6 +1,7 @@
 class FilmExceptionMessages:
     FILM_NOT_FOUND = "Film not found"
     FILMS_NOT_FOUND = "Films not found"
+    FILMS_NOT_ALLOWED = "Films not allowed"
 
 
 class GenreExceptionMessages:

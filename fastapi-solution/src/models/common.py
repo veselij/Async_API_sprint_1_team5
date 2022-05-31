@@ -33,6 +33,7 @@ class Film(BaseModel):
     actors: Optional[list[dict[str, str]]]
     writers: Optional[list[dict[str, str]]]
     directors: Optional[list[dict[str, str]]]
+    subscription: Optional[list[dict[str, str]]]
 
     def get_api_fields(self) -> dict:
         return {

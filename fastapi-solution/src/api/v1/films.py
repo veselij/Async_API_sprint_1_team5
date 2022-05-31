@@ -30,17 +30,18 @@ async def popular_films(
     sort: str = Query("-imdb_rating", regex="^-imdb_rating$|^imdb_rating$"),
     genre: Optional[str] = None,
     film_service: RetrivalService = Depends(get_short_film_service),
-    roles: list = Depends(TokenCheck()),
+    subscriptions: list = Depends(TokenCheck()),
 ) -> list[ShortFilmAPI]:
-    print("ROLESSSS", roles)
     films = await film_service.get_by_query(
         sort=sort,
         size=page_param.page_size,
         from_=page_param.get_starting_doc(),
-        **get_query_film_by_genre(genre),
+        **get_query_film_by_genre(genre, subscriptions),
     )
     if not films:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILMS_NOT_FOUND)
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILMS_NOT_FOUND
+        )
     return [ShortFilmAPI(**film.get_api_fields()) for film in films]
 
 
@@ -54,11 +55,16 @@ async def popular_films(
 async def film_details(
     uuid: str,
     film_service: RetrivalService = Depends(get_film_service),
+    subscriptions: list = Depends(TokenCheck()),
 ) -> FilmAPI:
     film = await film_service.get_by_id(uuid)
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILM_NOT_FOUND)
-    return FilmAPI(**film.get_api_fields())
+    if not film.subscription or list(set(subscriptions) & set(film.subscription)):
+        return FilmAPI(**film.get_api_fields())
+    raise HTTPException(
+        status_code=HTTPStatus.UNAUTHORIZED, detail=FEM.FILM_NOT_ALLOWED
+    )
 
 
 @router.get(
@@ -75,12 +81,13 @@ async def films_search(
     film_service: RetrivalService = Depends(get_short_film_service),
     subscriptions: list = Depends(TokenCheck()),
 ) -> list[ShortFilmAPI]:
-    print(get_query_film_search(query, ['test']))
     films = await film_service.get_by_query(
         size=page_param.page_size,
         from_=page_param.get_starting_doc(),
-        **get_query_film_search(query, ['test']),
+        **get_query_film_search(query, subscriptions),
     )
     if not films:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILMS_NOT_FOUND)
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILMS_NOT_FOUND
+        )
     return [ShortFilmAPI(**film.get_api_fields()) for film in films]

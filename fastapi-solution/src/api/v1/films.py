@@ -78,7 +78,7 @@ async def films_search(
     films = await film_service.get_by_query(
         size=page_param.page_size,
         from_=page_param.get_starting_doc(),
-        **get_query_film_search(query, subscriptions),
+        **get_query_film_search(query, ['test']),
     )
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILMS_NOT_FOUND)

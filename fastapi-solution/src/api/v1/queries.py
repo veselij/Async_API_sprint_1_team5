@@ -8,25 +8,19 @@ def get_query_film_by_genre(
         return {
             "query": {
                 "bool": {
-                    "must": [
+                    "must": {
+                        "nested": {
+                            "path": "genre",
+                            "query": {"term": {"genre.uuid": genre}},
+                        }
+                    },
+                    "filter": [
                         {
-                            "nested": {
-                                "path": "genre",
-                                "query": {"term": {"genre.uuid": genre}},
+                            "bool": {
+                                "should": prepare_subscriptions_filter(subscriptions)
                             }
-                        },
-                        {
-                            "filter": [
-                                {
-                                    "bool": {
-                                        "should": prepare_subscriptions_filter(
-                                            subscriptions
-                                        )
-                                    }
-                                }
-                            ]
-                        },
-                    ]
+                        }
+                    ],
                 }
             }
         }
@@ -61,26 +55,16 @@ def get_query_film_search(search_word: str, subscriptions: list) -> dict[str, An
     return {
         "query": {
             "bool": {
-                "must": [
-                    {
-                        "multi_match": {
-                            "query": search_word,
-                            "fuzziness": "auto",
-                            "fields": ["title", "description"],
-                        }
-                    },
-                    {
-                        "filter": [
-                            {
-                                "bool": {
-                                    "should": prepare_subscriptions_filter(
-                                        subscriptions
-                                    )
-                                }
-                            }
-                        ]
-                    },
-                ]
+                "must": {
+                    "multi_match": {
+                        "query": search_word,
+                        "fuzziness": "auto",
+                        "fields": ["title", "description"],
+                    }
+                },
+                "filter": [
+                    {"bool": {"should": prepare_subscriptions_filter(subscriptions)}}
+                ],
             }
         }
     }

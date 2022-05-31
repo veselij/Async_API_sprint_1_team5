@@ -12,7 +12,7 @@ def prepare_subscriptions_filter(subsriptions: list) -> list:
     for subscrption in subsriptions:
         element = {"nested": {"path": "actors", "query": {"term": {"actors.name": subscrption}}}}
         filter.append(element)
-    return element
+    return filter
 
 
 def get_query_film_search(search_word: str, subscriptions: list) -> dict[str, Any]:

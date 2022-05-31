@@ -81,6 +81,7 @@ async def films_search(
     film_service: RetrivalService = Depends(get_short_film_service),
     subscriptions: list = Depends(TokenCheck()),
 ) -> list[ShortFilmAPI]:
+    print(get_query_film_search(query, subscriptions))
     films = await film_service.get_by_query(
         size=page_param.page_size,
         from_=page_param.get_starting_doc(),

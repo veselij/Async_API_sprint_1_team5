@@ -1,3 +1,4 @@
+from http.client import HTTPException
 import httpx
 from fastapi.security.http import HTTPBearer
 from orjson import JSONDecodeError
@@ -17,10 +18,10 @@ class TokenCheck(HTTPBearer):
         if not credentials:
             return []
         token = credentials.credentials
-        roles = await self.send_request_to_auth(token)
-        if roles is None or "role_id" not in roles:
+        user_roles_resonse = await self.send_request_to_auth(token)
+        if user_roles_resonse is None:
             return []
-        return roles["role_id"]
+        return user_roles_resonse
 
     @backoff_async(
         config.logger,
@@ -37,8 +38,10 @@ class TokenCheck(HTTPBearer):
                 )
             except httpx.ReadTimeout:
                 raise RetryExceptionError("Auth server not available")
-            try:
-                result = response.json()
-            except JSONDecodeError:
-                result = []
+            result = response.json()
+            if response.status_code in (
+                httpx.codes.UNPROCESSABLE_ENTITY,
+                httpx.codes.UNAUTHORIZED,
+            ):
+                raise HTTPException(response.status_code, detail=result)
         return result

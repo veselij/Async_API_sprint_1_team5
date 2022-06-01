@@ -1,5 +1,6 @@
-from aioredis import Redis, ConnectionClosedError
 from typing import Type
+
+from aioredis import ConnectionClosedError, Redis
 
 redis_client: Redis
 

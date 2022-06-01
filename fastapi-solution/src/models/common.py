@@ -45,6 +45,7 @@ class Film(BaseModel):
             "actors": self.actors,
             "writers": self.writers,
             "directors": self.directors,
+            "subscription": self.subscription,
         }
 
 

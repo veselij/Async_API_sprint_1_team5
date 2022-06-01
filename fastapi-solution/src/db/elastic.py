@@ -1,6 +1,7 @@
 from typing import Type
-from elasticsearch import AsyncElasticsearch
+
 from elastic_transport import ConnectionError
+from elasticsearch import AsyncElasticsearch
 
 es: AsyncElasticsearch
 

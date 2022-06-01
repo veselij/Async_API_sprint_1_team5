@@ -2,7 +2,8 @@ from typing import Any, Optional
 
 
 def get_query_film_by_genre(
-    subscriptions: list, genre: Optional[str]
+    genre: Optional[str],
+    subscriptions: list,
 ) -> dict[str, Any]:
     if genre:
         return {
@@ -14,13 +15,7 @@ def get_query_film_by_genre(
                             "query": {"term": {"genre.uuid": genre}},
                         }
                     },
-                    "filter": [
-                        {
-                            "bool": {
-                                "should": prepare_subscriptions_filter(subscriptions)
-                            }
-                        }
-                    ],
+                    "filter": [{"bool": {"should": prepare_subscriptions_filter(subscriptions)}}],
                 }
             }
         }
@@ -62,9 +57,7 @@ def get_query_film_search(search_word: str, subscriptions: list) -> dict[str, An
                         "fields": ["title", "description"],
                     }
                 },
-                "filter": [
-                    {"bool": {"should": prepare_subscriptions_filter(subscriptions)}}
-                ],
+                "filter": [{"bool": {"should": prepare_subscriptions_filter(subscriptions)}}],
             }
         }
     }
@@ -113,11 +106,7 @@ def get_query_films_by_person(person: str) -> dict[str, Any]:
 
 def _get_query_film_by_genre(genre: Optional[str]) -> dict[str, Any]:
     if genre is not None:
-        return {
-            "query": {
-                "nested": {"path": "genre", "query": {"term": {"genre.uuid": genre}}}
-            }
-        }
+        return {"query": {"nested": {"path": "genre", "query": {"term": {"genre.uuid": genre}}}}}
     return {"query": None}
 
 

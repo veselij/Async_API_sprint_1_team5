@@ -1,16 +1,18 @@
 from http import HTTPStatus
 
-from api.v1.queries import get_query_films_by_person, get_query_person_search
-from api.v1.pagination import PaginatedParams
-from core.decorators import cache
-from .exceptions import PersonExceptionMessages as PEM
 from fastapi.exceptions import HTTPException
 from fastapi.param_functions import Depends, Query
 from fastapi.routing import APIRouter
-from models.response_models import ShortFilmAPI, PersonAPI
+
+from api.v1.pagination import PaginatedParams
+from api.v1.queries import get_query_films_by_person, get_query_person_search
+from core.decorators import cache
+from models.response_models import PersonAPI, ShortFilmAPI
 from services.common import RetrivalService
 from services.films import get_short_film_service
 from services.persons import get_person_service
+
+from .exceptions import PersonExceptionMessages as PEM
 
 router = APIRouter()
 

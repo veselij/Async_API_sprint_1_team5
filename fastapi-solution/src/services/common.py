@@ -1,17 +1,10 @@
 from abc import ABC, abstractmethod
-import logging
 from typing import Optional, Type
 
-from models.common import BaseModel
+from core.config import logger
 from core.decorators import backoff_async
 from core.exceptions import RetryExceptionError
-
-
-logger = logging.getLogger(__name__)
-formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-fh = logging.FileHandler(filename="/var/log/waiters/backoff.log")
-fh.setFormatter(formatter)
-logger.addHandler(fh)
+from models.common import BaseModel
 
 
 class AbstractDatabase(ABC):

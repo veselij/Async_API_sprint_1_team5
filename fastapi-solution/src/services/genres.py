@@ -1,12 +1,13 @@
 from functools import lru_cache
 from typing import Type
 
+from fastapi.param_functions import Depends
+
 from db.elastic import get_elastic
 from db.redis import get_redis
-from fastapi.param_functions import Depends
 from models.common import Genre
-
-from services.common import DataBaseManager, Cache, RetrivalService, AbstractCache, AbstractDatabase
+from services.common import (AbstractCache, AbstractDatabase, Cache,
+                             DataBaseManager, RetrivalService)
 
 
 @lru_cache()

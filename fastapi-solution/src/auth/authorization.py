@@ -18,15 +18,23 @@ class TokenCheck(HTTPBearer):
             return []
         token = credentials.credentials
         roles = await self.send_request_to_auth(token)
-        if roles is None:
+        if roles is None or "role_id" not in roles:
             return []
-        return roles
+        return roles["role_id"]
 
-    @backoff_async(config.logger, start_sleep_time=0.1, factor=2, border_sleep_time=10, max_retray=2)
+    @backoff_async(
+        config.logger,
+        start_sleep_time=0.1,
+        factor=2,
+        border_sleep_time=10,
+        max_retray=2,
+    )
     async def send_request_to_auth(self, token: str) -> list:
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.post(config.AUTH_URL, json={"access_token": token})
+                response = await client.post(
+                    config.AUTH_URL, json={"access_token": token}
+                )
             except httpx.ReadTimeout:
                 raise RetryExceptionError("Auth server not available")
             try:

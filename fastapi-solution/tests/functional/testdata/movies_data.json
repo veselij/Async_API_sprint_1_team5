@@ -18,6 +18,7 @@
       "name": "Fantasy"
     }
   ],
+  "subscription": [],
   "actors": [
     {
       "uuid":"01377f6d-9767-48ce-9e37-3c81f8a3c739",
@@ -93,6 +94,7 @@
       "name": "Documentary"
     }
   ],
+  "subscription": [],
   "actors": [
     {
       "uuid": "901595ba-4278-4224-b04c-974c28428a08",
@@ -117,6 +119,7 @@
       "name": "Documentary"
     }
   ],
+  "subscription": [],
   "actors": [
     {
       "uuid": "901595ba-4278-4224-b04c-974c28428a08",

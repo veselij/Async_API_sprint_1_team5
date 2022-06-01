@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from re import sub
 from typing import Optional
 
 from fastapi.exceptions import HTTPException
@@ -39,7 +40,9 @@ async def popular_films(
         **get_query_film_by_genre(genre, subscriptions),
     )
     if not films:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILMS_NOT_FOUND)
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILMS_NOT_FOUND
+        )
     return [ShortFilmAPI(**film.get_api_fields()) for film in films]
 
 
@@ -59,9 +62,15 @@ async def film_details(
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILM_NOT_FOUND)
     film = FilmAPI(**film.get_api_fields())
-    if not film.subscription or list(set(subscriptions) & set([s["name"] for s in film.subscription])):
+    print(subscriptions)
+    print(film.subscription)
+    if not film.subscription or list(
+        set(subscriptions) & set([s["name"] for s in film.subscription])
+    ):
         return film
-    raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail=FEM.FILM_NOT_ALLOWED)
+    raise HTTPException(
+        status_code=HTTPStatus.UNAUTHORIZED, detail=FEM.FILM_NOT_ALLOWED
+    )
 
 
 @router.get(
@@ -84,5 +93,7 @@ async def films_search(
         **get_query_film_search(query, subscriptions),
     )
     if not films:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILMS_NOT_FOUND)
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILMS_NOT_FOUND
+        )
     return [ShortFilmAPI(**film.get_api_fields()) for film in films]

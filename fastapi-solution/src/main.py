@@ -20,9 +20,13 @@ app = FastAPI(
 @app.on_event("startup")
 async def startup():
     redis.redis_client = await aioredis.create_redis_pool(
-        (config.REDIS_HOST, config.REDIS_PORT), minsize=10, maxsize=20,
+        (config.REDIS_HOST, config.REDIS_PORT),
+        minsize=10,
+        maxsize=20,
     )
-    elastic.es = AsyncElasticsearch(hosts=[f"http://{config.ELASTIC_HOST}:{config.ELASTIC_PORT}"]).options(ignore_status=404)
+    elastic.es = AsyncElasticsearch(hosts=[f"http://{config.ELASTIC_HOST}:{config.ELASTIC_PORT}"]).options(
+        ignore_status=404
+    )
 
 
 @app.on_event("shutdown")
@@ -34,4 +38,3 @@ async def shutdown():
 app.include_router(films.router, prefix="/api/v1/films", tags=["Фильмы"])
 app.include_router(genres.router, prefix="/api/v1/genres", tags=["Жанры"])
 app.include_router(persons.router, prefix="/api/v1/persons", tags=["Персоны"])
-

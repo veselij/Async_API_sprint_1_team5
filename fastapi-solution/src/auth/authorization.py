@@ -1,12 +1,14 @@
+import httpx
 from fastapi.security.http import HTTPBearer
 from orjson import JSONDecodeError
 from starlette.requests import Request
-import httpx
+
 from core import config
+from core.decorators import backoff_async
+from core.exceptions import RetryExceptionError
 
 
 class TokenCheck(HTTPBearer):
-
     def __init__(self, auto_error: bool = False) -> None:
         super().__init__(auto_error=auto_error)
 
@@ -16,11 +18,17 @@ class TokenCheck(HTTPBearer):
             return []
         token = credentials.credentials
         roles = await self.send_request_to_auth(token)
+        if roles is None:
+            return []
         return roles
 
+    @backoff_async(config.logger, start_sleep_time=0.1, factor=2, border_sleep_time=10, max_retray=2)
     async def send_request_to_auth(self, token: str) -> list:
         async with httpx.AsyncClient() as client:
-            response = await client.post(config.AUTH_URL, json={"access_token": token})
+            try:
+                response = await client.post(config.AUTH_URL, json={"access_token": token})
+            except httpx.ReadTimeout:
+                raise RetryExceptionError("Auth server not available")
             try:
                 result = response.json()
             except JSONDecodeError:

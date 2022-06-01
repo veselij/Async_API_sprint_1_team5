@@ -1,23 +1,24 @@
 from http import HTTPStatus
 from typing import Optional
 
-from api.v1.queries import get_query_film_by_genre, get_query_film_search
-from api.v1.pagination import PaginatedParams
-from core.decorators import cache
-from .exceptions import FilmExceptionMessages as FEM
 from fastapi.exceptions import HTTPException
 from fastapi.param_functions import Depends, Query
 from fastapi.routing import APIRouter
+
+from api.v1.exceptions import FilmExceptionMessages as FEM
+from api.v1.pagination import PaginatedParams
+from api.v1.queries import get_query_film_by_genre, get_query_film_search
+from auth.authorization import TokenCheck
+from core.decorators import cache
 from models.response_models import FilmAPI, ShortFilmAPI
 from services.common import RetrivalService
 from services.films import get_film_service, get_short_film_service
-from auth.authorization import TokenCheck
 
 router = APIRouter()
 
 
 @router.get(
-    '/', 
+    "/",
     response_model=list[ShortFilmAPI],
     summary="все фильмы",
     description="Вывод всех популярных кинопроизведений",
@@ -26,14 +27,16 @@ router = APIRouter()
 @cache()
 async def popular_films(
     page_param: PaginatedParams = Depends(),
-    sort: str = Query('-imdb_rating', regex="^-imdb_rating$|^imdb_rating$"),
+    sort: str = Query("-imdb_rating", regex="^-imdb_rating$|^imdb_rating$"),
     genre: Optional[str] = None,
     film_service: RetrivalService = Depends(get_short_film_service),
-    roles: list = Depends(TokenCheck())
+    subscriptions: list = Depends(TokenCheck()),
 ) -> list[ShortFilmAPI]:
-    print('ROLESSSS', roles)
     films = await film_service.get_by_query(
-        sort=sort, size=page_param.page_size, from_=page_param.get_starting_doc(), **get_query_film_by_genre(genre),
+        sort=sort,
+        size=page_param.page_size,
+        from_=page_param.get_starting_doc(),
+        **get_query_film_by_genre(genre, subscriptions),
     )
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILMS_NOT_FOUND)
@@ -41,7 +44,7 @@ async def popular_films(
 
 
 @router.get(
-    '/{uuid}', 
+    "/{uuid}",
     response_model=FilmAPI,
     summary="Фильм по uuid",
     description="Запрос фильма по его идентификатору",
@@ -50,15 +53,19 @@ async def popular_films(
 async def film_details(
     uuid: str,
     film_service: RetrivalService = Depends(get_film_service),
+    subscriptions: list = Depends(TokenCheck()),
 ) -> FilmAPI:
     film = await film_service.get_by_id(uuid)
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILM_NOT_FOUND)
-    return FilmAPI(**film.get_api_fields())
+    film = FilmAPI(**film.get_api_fields())
+    if not film.subscription or list(set(subscriptions) & set([s["name"] for s in film.subscription])):
+        return film
+    raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail=FEM.FILM_NOT_ALLOWED)
 
 
 @router.get(
-    '/search/',
+    "/search/",
     response_model=list[ShortFilmAPI],
     summary="поиск фильма",
     description="Полнотекстовый поиск по кинопроизведениям",
@@ -69,9 +76,12 @@ async def films_search(
     query: str,
     page_param: PaginatedParams = Depends(),
     film_service: RetrivalService = Depends(get_short_film_service),
+    subscriptions: list = Depends(TokenCheck()),
 ) -> list[ShortFilmAPI]:
     films = await film_service.get_by_query(
-        size=page_param.page_size, from_=page_param.get_starting_doc(), **get_query_film_search(query, "e7448447-64a6-4f63-b37c-39b002b4ef20"),
+        size=page_param.page_size,
+        from_=page_param.get_starting_doc(),
+        **get_query_film_search(query, subscriptions),
     )
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FEM.FILMS_NOT_FOUND)

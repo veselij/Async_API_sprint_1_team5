@@ -1,20 +1,22 @@
 from http import HTTPStatus
 
-from api.v1.pagination import PaginatedParams
-from core.decorators import cache
 from fastapi.exceptions import HTTPException
 from fastapi.param_functions import Depends
 from fastapi.routing import APIRouter
-from .exceptions import GenreExceptionMessages as GEM
+
+from api.v1.pagination import PaginatedParams
+from core.decorators import cache
 from models.response_models import GenreAPI
 from services.common import RetrivalService
 from services.genres import get_genre_service
+
+from .exceptions import GenreExceptionMessages as GEM
 
 router = APIRouter()
 
 
 @router.get(
-    '/',
+    "/",
     response_model=list[GenreAPI],
     summary="все жанры",
     description="Постраничный вывод жанров",
@@ -32,14 +34,15 @@ async def get_genres(
 
 
 @router.get(
-    '/{uuid}',
+    "/{uuid}",
     response_model=GenreAPI,
     summary="жанр по uuid",
     description="Поиск жанра по идентификатору",
     response_description="Название и описание жанра",
 )
 async def genre_details(
-    uuid: str, genre_services: RetrivalService = Depends(get_genre_service),
+    uuid: str,
+    genre_services: RetrivalService = Depends(get_genre_service),
 ) -> GenreAPI:
     genre = await genre_services.get_by_id(uuid)
     if not genre:

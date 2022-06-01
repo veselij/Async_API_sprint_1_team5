@@ -1,6 +1,8 @@
 from typing import Optional
-from .common import ConfigMixin
+
 from pydantic import BaseModel
+
+from .common import ConfigMixin
 
 
 class FilmAPI(BaseModel, ConfigMixin):
@@ -12,6 +14,7 @@ class FilmAPI(BaseModel, ConfigMixin):
     actors: Optional[list[dict[str, str]]]
     writers: Optional[list[dict[str, str]]]
     directors: Optional[list[dict[str, str]]]
+    subscription: Optional[list[dict[str, str]]]
 
 
 class ShortFilmAPI(BaseModel, ConfigMixin):
@@ -31,4 +34,3 @@ class PersonAPI(BaseModel, ConfigMixin):
     full_name: str
     role: str
     film_ids: Optional[list[str]]
-    
